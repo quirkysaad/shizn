@@ -1,4 +1,4 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { Grid, Clock, User } from "lucide-react-native";
 import { Tabs } from "expo-router";
 import theme from "../../utils/theme";
 
@@ -33,28 +33,21 @@ const TabLayout = () => {
         name="keypad"
         options={{
           title: "Keypad",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome size={24} name="th" color={color} />
-          ),
-
+          tabBarIcon: ({ color }) => <Grid size={24} color={color} />,
         }}
       />
       <Tabs.Screen
         name="index"
         options={{
           title: "Recents",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome size={24} name="clock-o" color={color} />
-          ),
+          tabBarIcon: ({ color }) => <Clock size={24} color={color} />,
         }}
       />
       <Tabs.Screen
         name="contacts"
         options={{
           title: "Contacts",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome size={24} name="user" color={color} />
-          ),
+          tabBarIcon: ({ color }) => <User size={24} color={color} />,
         }}
       />
     </Tabs>

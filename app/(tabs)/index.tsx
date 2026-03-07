@@ -1,7 +1,13 @@
 import React, { useCallback } from "react";
-import { View, Text, SectionList, TouchableOpacity, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  SectionList,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import CallLog from "../../components/CallLog";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { Search, MoreVertical, Clock } from "lucide-react-native";
 import { useRecents } from "../../utils/AppProviders";
 import theme from "../../utils/theme";
 
@@ -25,10 +31,10 @@ const Home = () => {
         </Text>
         <View className="flex-row gap-4">
           <TouchableOpacity>
-            <FontAwesome name="search" size={22} color={theme.colors.primary} />
+            <Search size={22} color={theme.colors.primary} />
           </TouchableOpacity>
           <TouchableOpacity>
-            <FontAwesome name="ellipsis-v" size={22} color={theme.colors.primary} />
+            <MoreVertical size={22} color={theme.colors.primary} />
           </TouchableOpacity>
         </View>
       </View>
@@ -65,7 +71,7 @@ const Home = () => {
           />
         ) : (
           <View className="flex-1 items-center justify-center">
-            <FontAwesome name="clock-o" size={48} color={theme.colors.border} />
+            <Clock size={48} color={theme.colors.border} />
             <Text className="text-textSecondary text-[17px] mt-4 font-medium">
               {"No recent calls"}
             </Text>

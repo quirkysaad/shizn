@@ -17,13 +17,13 @@ const KeypadButton = ({ number, letters, onPress, onLongPress, className }: Keyp
             onPress={() => onPress(number)}
             onLongPress={() => onLongPress && onLongPress(number)}
             className={cn(
-                "bg-card rounded-full w-[80px] h-[80px] justify-center items-center m-1 shadow-sm",
+                "w-[80px] h-[80px] justify-center items-center",
                 className
             )}
         >
             <Text className="text-3xl font-normal text-textPrimary">{number}</Text>
             {letters ? (
-                <Text className="text-[10px] text-textSecondary tracking-widest font-medium mt-1 uppercase">
+                <Text className="text-sm text-textSecondary tracking-widest font-medium mt-1 uppercase">
                     {letters}
                 </Text>
             ) : (

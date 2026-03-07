@@ -1,8 +1,11 @@
 import React, { useRef, useCallback } from "react";
 import { View, Text, TouchableOpacity, Linking } from "react-native";
-import MaterialIcons, {
-  MaterialIconsIconName,
-} from "@react-native-vector-icons/material-icons";
+import {
+  Phone,
+  PhoneIncoming,
+  PhoneMissed,
+  MessageSquare,
+} from "lucide-react-native";
 import ReanimatedSwipeable, {
   SwipeableMethods,
 } from "react-native-gesture-handler/ReanimatedSwipeable";
@@ -13,7 +16,7 @@ import Reanimated, {
   useAnimatedReaction,
   interpolate,
   Extrapolation,
-  SharedValue
+  SharedValue,
 } from "react-native-reanimated";
 import { CallLogsModule } from "../modules/dialer-module";
 import { CallSectionProps, CallTypes } from "../types";
@@ -34,12 +37,12 @@ type ActionProps = {
 
 const IconMap: Record<
   Exclude<CallTypes, "UNKNOWN">,
-  { iconName: MaterialIconsIconName; color: string }
+  { IconComponent: any; color: string }
 > = {
-  INCOMING: { iconName: "phone-callback", color: theme.colors.success },
-  OUTGOING: { iconName: "phone", color: theme.colors.primary },
-  MISSED: { iconName: "phone-missed", color: theme.colors.danger },
-  REJECTED: { iconName: "phone-missed", color: theme.colors.danger },
+  INCOMING: { IconComponent: PhoneIncoming, color: theme.colors.success },
+  OUTGOING: { IconComponent: Phone, color: theme.colors.primary },
+  MISSED: { IconComponent: PhoneMissed, color: theme.colors.danger },
+  REJECTED: { IconComponent: PhoneMissed, color: theme.colors.danger },
 };
 
 const formatDuration = (seconds: number): string => {
@@ -50,12 +53,18 @@ const formatDuration = (seconds: number): string => {
   return `${mins}m ${secs}s`;
 };
 
-const DragObserver = ({ drag, dragX }: { drag: SharedValue<number>; dragX: SharedValue<number> }) => {
+const DragObserver = ({
+  drag,
+  dragX,
+}: {
+  drag: SharedValue<number>;
+  dragX: SharedValue<number>;
+}) => {
   useAnimatedReaction(
     () => drag.value,
     (val) => {
       dragX.value = val;
-    }
+    },
   );
   return null;
 };
@@ -76,13 +85,13 @@ const CallLog = ({
         Math.abs(dragX.value),
         [0, 200],
         [1, 0.1],
-        Extrapolation.CLAMP
+        Extrapolation.CLAMP,
       ),
     };
   });
 
   const iconData = IconMap[logItem.type as keyof typeof IconMap] || {
-    iconName: "phone" as MaterialIconsIconName,
+    IconComponent: Phone,
     color: theme.colors.textSecondary,
   };
 
@@ -175,11 +184,7 @@ const CallLog = ({
           )}
         >
           <View className="w-11 h-11 rounded-full justify-center items-center mr-[14px]">
-            <MaterialIcons
-              name={iconData.iconName}
-              color={iconData.color}
-              size={22}
-            />
+            <iconData.IconComponent color={iconData.color} size={22} />
           </View>
           <View className="flex-1">
             <View className="flex-row items-center gap-[6px]">
@@ -242,7 +247,7 @@ const CallLog = ({
               alignItems: "center",
             }}
           >
-            <MaterialIcons name="call" color={theme.colors.primary} size={20} />
+            <Phone color={theme.colors.primary} size={20} />
           </TouchableOpacity>
         </TouchableOpacity>
       </Reanimated.View>
@@ -289,7 +294,7 @@ const RightAction = ({ className }: { className: string }) => (
     )}
   >
     <Text className="text-lg font-semibold text-white">{"Message"}</Text>
-    <MaterialIcons name="message" size={22} color={theme.colors.white} />
+    <MessageSquare size={22} color={theme.colors.white} />
   </View>
 );
 
@@ -300,7 +305,7 @@ const LeftAction = ({ className }: { className: string }) => (
       "flex-row items-center gap-2 w-full h-full bg-success px-4",
     )}
   >
-    <MaterialIcons name="call" size={22} color={theme.colors.white} />
+    <Phone size={22} color={theme.colors.white} />
     <Text className="text-lg font-semibold text-white">{"Call"}</Text>
   </View>
 );

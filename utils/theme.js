@@ -1,14 +1,22 @@
 const theme = {
   colors: {
-    primary: "#6B4EFF", // Main vibrant purple (buttons, icons, active states)
-    primaryLight: "#ECE8FF", // Light purple for secondary backgrounds / active tabs
-    background: "#F8F4FF", // Slightly tinted off-white/purple used as app background
-    card: "#FFFFFF", // Pure white for cards and list items
-    textPrimary: "#2D2A42", // Dark navy/purple for main text headings and names
-    textSecondary: "#A29FBA", // Muted grey/purple for timestamps and subtitles
-    border: "#E9E7F2", // Light soft border color
-    danger: "#FF5252", // Red for the end call button
-    success: "#4CAF50", // Standard green for accept call
+    primary: "#000000", // Deep black for active states and primary icons
+    primaryLight: "#F5F5F5", // Very light gray for active tabs/secondary backgrounds
+    background: "#FFFFFF", // Pure white background for a clean look
+    card: "#FFFFFF", // Pure white for cards
+    textPrimary: "#111111", // Near black for high contrast readability
+    textSecondary: "#888888", // Medium gray for timestamps and subtitles
+    border: "#EAEAEA", // Subtle soft border
+
+    // Dialer specific semantic colors
+    danger: "#FF3B30", // Main red for end call/decline
+    dangerLight: "#FFD8D6", // Light red for backgrounds/disabled states
+    dangerDark: "#D70015", // Dark red for pressed states
+
+    success: "#34C759", // Main green for dial/accept
+    successLight: "#D3F5DD", // Light green for backgrounds/disabled states
+    successDark: "#248A3D", // Dark green for pressed states
+
     white: "#FFFFFF",
   },
 };

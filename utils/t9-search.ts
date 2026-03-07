@@ -36,13 +36,26 @@ export const searchContactsT9 = (query: string, contacts: ContactsModule.Contact
 
   const lowerQuery = query.toLowerCase();
 
+  const isFuzzyMatch = (searchQuery: string, target: string): boolean => {
+    if (!searchQuery) return true;
+    if (!target) return false;
+    let qIdx = 0;
+    for (let i = 0; i < target.length; i++) {
+      if (target[i] === searchQuery[qIdx]) {
+        qIdx++;
+        if (qIdx === searchQuery.length) return true;
+      }
+    }
+    return false;
+  };
+
   return contacts.filter((contact) => {
-    // 1. Search by exact phone number match (removing spaces and dashes)
+    // 1. Search by fuzzy phone number match (removing spaces and dashes)
     let phoneMatch = false;
     if (contact.phoneNumbers) {
       for (const phone of contact.phoneNumbers) {
         const cleanNumber = phone.number?.replace(/[\s-()]/g, "") || "";
-        if (cleanNumber.includes(lowerQuery)) {
+        if (isFuzzyMatch(lowerQuery, cleanNumber)) {
           phoneMatch = true;
           break;
         }
@@ -51,10 +64,10 @@ export const searchContactsT9 = (query: string, contacts: ContactsModule.Contact
 
     if (phoneMatch) return true;
 
-    // 2. Search by T9 name match
+    // 2. Search by T9 name fuzzy match
     if (contact.name) {
       const t9Name = nameToT9Sequence(contact.name);
-      if (t9Name.includes(lowerQuery)) {
+      if (isFuzzyMatch(lowerQuery, t9Name)) {
         return true;
       }
     }
