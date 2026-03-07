@@ -17,6 +17,7 @@ module.exports = {
         border: theme.colors.border,
         danger: theme.colors.danger,
         success: theme.colors.success,
+        message: theme.colors.message,
         white: theme.colors.white,
       },
     },

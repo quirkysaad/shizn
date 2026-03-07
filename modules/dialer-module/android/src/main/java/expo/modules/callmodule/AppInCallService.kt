@@ -215,6 +215,22 @@ class AppInCallService : InCallService() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val acceptIntent = Intent(this, CallActionReceiver::class.java).apply {
+            action = CallActionReceiver.ACTION_ANSWER
+        }
+        val acceptPendingIntent = PendingIntent.getBroadcast(
+            this, 1, acceptIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val rejectIntent = Intent(this, CallActionReceiver::class.java).apply {
+            action = CallActionReceiver.ACTION_REJECT
+        }
+        val rejectPendingIntent = PendingIntent.getBroadcast(
+            this, 2, rejectIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_menu_call)
             .setContentTitle("Incoming Call")
@@ -223,6 +239,8 @@ class AppInCallService : InCallService() {
             .setCategory(NotificationCompat.CATEGORY_CALL)
             .setFullScreenIntent(fullScreenPendingIntent, true)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .addAction(android.R.drawable.ic_menu_call, "Accept", acceptPendingIntent)
+            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Reject", rejectPendingIntent)
             .setOngoing(true)
             .setAutoCancel(false)
             .build()

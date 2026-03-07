@@ -6,6 +6,7 @@ declare class CallModule extends NativeModule {
   deleteCallLog(id: string): Promise<boolean>;
   makeCall(phoneNumber: string): Promise<boolean>;
   requestDefaultDialer(): Promise<boolean>;
+  isDefaultDialer(): Promise<boolean>;
   answerCall(): void;
   rejectCall(): void;
   disconnectCall(): void;

@@ -12,7 +12,7 @@ import {
   Platform,
 } from "react-native";
 import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import * as Contacts from "expo-contacts";
 import { ArrowLeft, User, PlusCircle, MinusCircle } from "lucide-react-native";
 import { useContacts } from "../../utils/AppProviders";
@@ -21,9 +21,12 @@ import theme from "../../utils/theme";
 export default function CreateContact() {
   const router = useRouter();
   const { refresh } = useContacts();
+  const { number } = useLocalSearchParams<{ number: string }>();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [phones, setPhones] = useState([{ label: "mobile", number: "" }]);
+  const [phones, setPhones] = useState([
+    { label: "mobile", number: number || "" },
+  ]);
   const [email, setEmail] = useState("");
   const [saving, setSaving] = useState(false);
 

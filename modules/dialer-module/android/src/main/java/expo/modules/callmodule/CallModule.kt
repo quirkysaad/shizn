@@ -192,13 +192,37 @@ class CallModule : Module() {
       }
       val telecomManager = activity.getSystemService(android.content.Context.TELECOM_SERVICE) as TelecomManager
       if (activity.packageName != telecomManager.defaultDialerPackage) {
-        val intent = android.content.Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER)
-        intent.putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME, activity.packageName)
-        activity.startActivity(intent)
-        promise.resolve(true)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            val roleManager = activity.getSystemService(android.app.role.RoleManager::class.java)
+            if (roleManager != null && roleManager.isRoleAvailable(android.app.role.RoleManager.ROLE_DIALER)) {
+                val intent = roleManager.createRequestRoleIntent(android.app.role.RoleManager.ROLE_DIALER)
+                activity.startActivityForResult(intent, 123)
+            } else {
+                val intent = android.content.Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER)
+                intent.putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME, activity.packageName)
+                activity.startActivity(intent)
+            }
+        } else {
+            val intent = android.content.Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER)
+            intent.putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME, activity.packageName)
+            activity.startActivity(intent)
+        }
+        promise.resolve(false) // Not default yet, just requested
       } else {
-        promise.resolve(true)
+        promise.resolve(true) // Already default
       }
+    }
+
+    // Check if is Default Dialer
+    AsyncFunction("isDefaultDialer") { promise: Promise ->
+      val context = appContext.reactContext ?: appContext.currentActivity
+      if (context == null) {
+        promise.resolve(false)
+        return@AsyncFunction
+      }
+      val telecomManager = context.getSystemService(android.content.Context.TELECOM_SERVICE) as TelecomManager
+      val isDefault = context.packageName == telecomManager.defaultDialerPackage
+      promise.resolve(isDefault)
     }
 
     // Answer

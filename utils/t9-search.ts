@@ -49,29 +49,45 @@ export const searchContactsT9 = (query: string, contacts: ContactsModule.Contact
     return false;
   };
 
-  return contacts.filter((contact) => {
-    // 1. Search by fuzzy phone number match (removing spaces and dashes)
-    let phoneMatch = false;
+  const scoredContacts = contacts.map((contact) => {
+    let score = 0;
+
+    const t9Name = contact.name ? nameToT9Sequence(contact.name) : "";
+    let cleanNumbers: string[] = [];
+
     if (contact.phoneNumbers) {
-      for (const phone of contact.phoneNumbers) {
-        const cleanNumber = phone.number?.replace(/[\s-()]/g, "") || "";
-        if (isFuzzyMatch(lowerQuery, cleanNumber)) {
-          phoneMatch = true;
-          break;
-        }
+      cleanNumbers = contact.phoneNumbers.map(
+        (phone) => phone.number?.replace(/[\s-()]/g, "") || ""
+      );
+    }
+
+    // 1. Highest priority - number includes in contact number
+    const numberIncludes = cleanNumbers.some((num) => num.includes(lowerQuery));
+    
+    // 2. Medium priority - name includes while typing in t9results
+    const nameIncludes = t9Name.includes(lowerQuery);
+
+    if (numberIncludes) {
+      score = 3;
+    } else if (nameIncludes) {
+      score = 2;
+    } else {
+      // 3. Lowest priority - fuzzy match
+      const fuzzyNumber = cleanNumbers.some((num) =>
+        isFuzzyMatch(lowerQuery, num)
+      );
+      const fuzzyName = isFuzzyMatch(lowerQuery, t9Name);
+
+      if (fuzzyNumber || fuzzyName) {
+        score = 1;
       }
     }
 
-    if (phoneMatch) return true;
-
-    // 2. Search by T9 name fuzzy match
-    if (contact.name) {
-      const t9Name = nameToT9Sequence(contact.name);
-      if (isFuzzyMatch(lowerQuery, t9Name)) {
-        return true;
-      }
-    }
-
-    return false;
+    return { contact, score };
   });
+
+  return scoredContacts
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map((item) => item.contact);
 };

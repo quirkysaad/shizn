@@ -17,6 +17,14 @@ const theme = {
     successLight: "#D3F5DD", // Light green for backgrounds/disabled states
     successDark: "#248A3D", // Dark green for pressed states
 
+    message: "#D9A000", // Darkish yellow for messages
+    messageLight: "#F8DF8B", // Light dark-yellow
+    messageDark: "#A67A00", // Even darker yellow
+
+    warning: "#FF9500", // Yellow-orange for missed calls
+    warningLight: "#FFECC2",
+    warningDark: "#B36800",
+
     white: "#FFFFFF",
   },
 };

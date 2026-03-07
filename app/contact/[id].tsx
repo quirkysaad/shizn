@@ -22,10 +22,14 @@ import {
   PlusCircle,
   MinusCircle,
   Trash,
+  History,
 } from "lucide-react-native";
 import { CallLogsModule } from "../../modules/dialer-module";
-import { useContacts } from "../../utils/AppProviders";
+import { useContacts, useRecents } from "../../utils/AppProviders";
 import theme from "../../utils/theme";
+import { CallLogProps, CallSectionProps } from "../../types";
+import CallLog from "../../components/CallLog";
+import { groupCallsByDate } from "../../utils/general-utils";
 
 export default function ContactDetail() {
   const router = useRouter();
@@ -35,12 +39,37 @@ export default function ContactDetail() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [callHistory, setCallHistory] = useState<CallLogProps[]>([]);
 
   // Editable fields
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phones, setPhones] = useState<{ label: string; number: string }[]>([]);
   const [email, setEmail] = useState("");
+
+  const loadCallHistory = useCallback(
+    async (contactPhones: string[], contactName?: string) => {
+      try {
+        const result = await CallLogsModule.getCallLogs(500, 0);
+        if (result && result.logs) {
+          const normalizedNumbers = contactPhones.map((n) =>
+            n.replace(/\D/g, "").slice(-10),
+          );
+          const filtered = (result.logs as CallLogProps[]).filter((log) => {
+            const logNormalized = log.number.replace(/\D/g, "").slice(-10);
+            const numberMatch =
+              logNormalized && normalizedNumbers.includes(logNormalized);
+            const nameMatch = contactName && log.name === contactName;
+            return numberMatch || nameMatch;
+          });
+          setCallHistory(filtered.slice(0, 30));
+        }
+      } catch (e) {
+        console.log("Error loading call history:", e);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     if (!id) return;
@@ -56,13 +85,22 @@ export default function ContactDetail() {
           setContact(result);
           setFirstName(result.firstName || "");
           setLastName(result.lastName || "");
-          setPhones(
+          const contactPhones =
             result.phoneNumbers?.map((p) => ({
               label: p.label || "mobile",
               number: p.number || "",
-            })) || [{ label: "mobile", number: "" }],
+            })) || [];
+          setPhones(
+            contactPhones.length > 0
+              ? contactPhones
+              : [{ label: "mobile", number: "" }],
           );
           setEmail(result.emails?.[0]?.email || "");
+
+          loadCallHistory(
+            contactPhones.map((p) => p.number),
+            result.name,
+          );
         }
       } catch (e) {
         console.log("Error loading contact:", e);
@@ -352,6 +390,55 @@ export default function ContactDetail() {
               </View>
             </View>
           ) : null}
+
+          {/* Call History Section */}
+          {!editing && callHistory.length > 0 && (
+            <Animated.View
+              entering={FadeInDown.delay(350).duration(400)}
+              className="mb-6"
+            >
+              <View className="flex-row items-center gap-2 mb-3">
+                <History size={16} color={theme.colors.textSecondary} />
+                <Text className="text-sm font-semibold text-textSecondary uppercase tracking-[0.5px]">
+                  {"Call History"}
+                </Text>
+              </View>
+
+              <View
+                className="bg-card rounded-2xl border border-border overflow-hidden"
+                style={{ maxHeight: 400 }} // Make it a scrollable sub-section
+              >
+                <ScrollView
+                  nestedScrollEnabled
+                  showsVerticalScrollIndicator={false}
+                >
+                  {groupCallsByDate(callHistory).map(
+                    (section: CallSectionProps, sIdx: number) => (
+                      <View key={section.title + sIdx}>
+                        <View className="bg-primaryLight/30 px-4 py-1.5">
+                          <Text className="text-[11px] font-bold text-textSecondary uppercase tracking-[1px]">
+                            {section.title}
+                          </Text>
+                        </View>
+                        {section.data.map((log, index) => (
+                          <CallLog
+                            key={log.id || index.toString()}
+                            logItem={log}
+                            logIndex={index}
+                            isLastLogOfSection={
+                              index === section.data.length - 1
+                            }
+                            swipeDisabled={true}
+                            hideCallButton={true}
+                          />
+                        ))}
+                      </View>
+                    ),
+                  )}
+                </ScrollView>
+              </View>
+            </Animated.View>
+          )}
 
           {/* Delete button */}
           <Animated.View entering={FadeInDown.delay(400).duration(400)}>

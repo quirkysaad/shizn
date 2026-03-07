@@ -8,11 +8,38 @@ import {
 } from "react-native";
 import CallLog from "../../components/CallLog";
 import { Search, MoreVertical, Clock } from "lucide-react-native";
-import { useRecents } from "../../utils/AppProviders";
+import { useRouter } from "expo-router";
+import { useRecents, useContacts } from "../../utils/AppProviders";
 import theme from "../../utils/theme";
+import { CallLogProps } from "../../types";
 
 const Home = () => {
+  const router = useRouter();
   const { sections, loading, loadMore, hasMore } = useRecents();
+  const { contacts } = useContacts();
+
+  const handlePress = useCallback(
+    (item: CallLogProps) => {
+      if (!item.number || item.number === "Unknown") return;
+
+      const normalize = (num: string) => num.replace(/\D/g, "").slice(-10);
+      const logNum = normalize(item.number);
+
+      const contact = contacts.find((c) =>
+        c.phoneNumbers?.some((p) => p.number && normalize(p.number) === logNum),
+      ) as any;
+
+      if (contact?.id) {
+        router.push(`/contact/${contact.id}`);
+      } else {
+        router.push({
+          pathname: "/contact/create",
+          params: { number: item.number },
+        });
+      }
+    },
+    [contacts, router],
+  );
 
   const renderFooter = useCallback(() => {
     if (!hasMore) return null;
@@ -55,6 +82,7 @@ const Home = () => {
                 logItem={item}
                 logIndex={index}
                 isLastLogOfSection={index === section.data.length - 1}
+                onPress={() => handlePress(item)}
               />
             )}
             renderSectionHeader={({ section }) => (

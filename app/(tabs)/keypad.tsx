@@ -1,7 +1,15 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import { Phone, Delete } from "lucide-react-native";
+import React, { useState, useCallback, useMemo } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Linking,
+} from "react-native";
+import { Phone, Delete, UserPlus, MessageCircle } from "lucide-react-native";
+import { useRouter } from "expo-router";
 import KeypadButton from "../../components/KeypadButton";
+import ActionButton from "../../components/ActionButton";
 import { CallLogsModule } from "../../modules/dialer-module";
 import { useContacts } from "../../utils/AppProviders";
 import { searchContactsT9 } from "../../utils/t9-search";
@@ -32,6 +40,7 @@ const padRows = [
 ];
 
 function KeypadScreen() {
+  const router = useRouter();
   const [phoneNumber, setPhoneNumber] = useState("");
   const { contacts } = useContacts();
 
@@ -86,19 +95,41 @@ function KeypadScreen() {
                 isLastLogOfSection={index === t9Results.length - 1}
                 onCall={(num) => CallLogsModule.makeCall(num)}
                 className="w-full"
+                onPress={() => {
+                  if ((result as any).id) {
+                    router.push(`/contact/${(result as any).id}`);
+                  }
+                }}
               />
             ))}
 
             {phoneNumber.length > 0 && (
-              <TouchableOpacity className="py-3 px-8">
-                <Text className="text-primary font-medium text-[17px]">
-                  {"Create new contact"}
-                </Text>
-              </TouchableOpacity>
+              <View className="px-6 pt-4 pb-2 w-full flex flex-row gap-3">
+                <ActionButton
+                  icon={UserPlus}
+                  label="Create new contact"
+                  onPress={() => {
+                    router.push({
+                      pathname: "/contact/create",
+                      params: { number: phoneNumber },
+                    });
+                  }}
+                  className="grow"
+                />
+                <ActionButton
+                  icon={MessageCircle}
+                  label=""
+                  onPress={() => {
+                    const cleanNumber =
+                      phoneNumber?.replace(/[\s-()]/g, "") || "";
+                    Linking.openURL(`sms:${cleanNumber}`);
+                  }}
+                />
+              </View>
             )}
           </ScrollView>
 
-          <View className="flex flex-row items-center justify-center pb-2">
+          <View className="flex flex-row items-center justify-center pb-2 px-6">
             <Text
               className="grow text-[36px] font-normal text-textPrimary text-center"
               numberOfLines={1}

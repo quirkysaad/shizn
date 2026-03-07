@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
     <uses-permission android:name="android.permission.WRITE_CALL_LOG" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application>
         <service android:name="expo.modules.callmodule.AppInCallService"
@@ -16,5 +17,12 @@
                 <action android:name="android.telecom.InCallService" />
             </intent-filter>
         </service>
+
+        <receiver android:name="expo.modules.callmodule.CallActionReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="expo.modules.callmodule.ACTION_ANSWER" />
+                <action android:name="expo.modules.callmodule.ACTION_REJECT" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>
