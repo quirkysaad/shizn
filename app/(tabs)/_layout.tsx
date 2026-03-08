@@ -1,17 +1,19 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Grid, Clock, User } from "lucide-react-native";
 import { Tabs } from "expo-router";
-import theme from "../../utils/theme";
+import { useTheme } from "../../utils/ThemeContext";
 
 const TabLayout = () => {
+  const { colors } = useTheme();
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <Tabs
         screenOptions={{
-          tabBarActiveTintColor: theme.colors.primary,
-          tabBarInactiveTintColor: theme.colors.textSecondary,
+          tabBarActiveTintColor: colors.primary,
+          tabBarInactiveTintColor: colors.textSecondary,
           tabBarStyle: {
-            backgroundColor: theme.colors.background,
+            backgroundColor: colors.background,
             borderTopWidth: 0,
             elevation: 0,
             shadowOpacity: 0,
@@ -24,7 +26,7 @@ const TabLayout = () => {
             fontWeight: "600",
           },
           sceneStyle: {
-            backgroundColor: theme.colors.background,
+            backgroundColor: colors.background,
           },
           headerShown: false,
           freezeOnBlur: true,

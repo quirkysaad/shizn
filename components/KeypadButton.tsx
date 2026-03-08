@@ -1,36 +1,50 @@
 import React from "react";
 import { TouchableOpacity, Text, View } from "react-native";
-import { cn } from "../utils/tailwind-utils";
+import { useTheme } from "../utils/ThemeContext";
 
 interface KeypadButtonProps {
-    number: string;
-    letters?: string;
-    onPress: (value: string) => void;
-    onLongPress?: (value: string) => void;
-    className?: string;
+  number: string;
+  letters?: string;
+  onPress: (value: string) => void;
+  onLongPress?: (value: string) => void;
 }
 
-const KeypadButton = ({ number, letters, onPress, onLongPress, className }: KeypadButtonProps) => {
-    return (
-        <TouchableOpacity
-            activeOpacity={0.6}
-            onPress={() => onPress(number)}
-            onLongPress={() => onLongPress && onLongPress(number)}
-            className={cn(
-                "w-[80px] h-[80px] justify-center items-center",
-                className
-            )}
+const KeypadButton = ({
+  number,
+  letters,
+  onPress,
+  onLongPress,
+}: KeypadButtonProps) => {
+  const { colors } = useTheme();
+
+  return (
+    <TouchableOpacity
+      activeOpacity={0.6}
+      onPress={() => onPress(number)}
+      onLongPress={() => onLongPress && onLongPress(number)}
+      className="mx-3 h-20 w-20 items-center justify-center"
+    >
+      <Text
+        className="text-[30px] font-normal"
+        style={{ color: colors.textPrimary }}
+      >
+        {number}
+      </Text>
+      {letters ? (
+        <Text
+          className="mt-1 text-sm font-medium uppercase"
+          style={{
+            color: colors.textSecondary,
+            letterSpacing: 1,
+          }}
         >
-            <Text className="text-3xl font-normal text-textPrimary">{number}</Text>
-            {letters ? (
-                <Text className="text-sm text-textSecondary tracking-widest font-medium mt-1 uppercase">
-                    {letters}
-                </Text>
-            ) : (
-                <View className="h-[14px] mt-1" />
-            )}
-        </TouchableOpacity>
-    );
+          {letters}
+        </Text>
+      ) : (
+        <View className="mt-1 h-[14px]" />
+      )}
+    </TouchableOpacity>
+  );
 };
 
 export default KeypadButton;

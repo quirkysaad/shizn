@@ -7,16 +7,19 @@ import {
   ActivityIndicator,
 } from "react-native";
 import CallLog from "../../components/CallLog";
-import { Search, MoreVertical, Clock } from "lucide-react-native";
+import { Search, MoreVertical, Clock, Settings } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { useRecents, useContacts } from "../../utils/AppProviders";
-import theme from "../../utils/theme";
+import { useTheme } from "../../utils/ThemeContext";
+import { useThemeDrawer } from "../../utils/ThemeDrawerContext";
 import { CallLogProps } from "../../types";
 
 const Home = () => {
   const router = useRouter();
   const { sections, loading, loadMore, hasMore } = useRecents();
   const { contacts } = useContacts();
+  const { colors } = useTheme();
+  const { openDrawer } = useThemeDrawer();
 
   const handlePress = useCallback(
     (item: CallLogProps) => {
@@ -44,36 +47,48 @@ const Home = () => {
   const renderFooter = useCallback(() => {
     if (!hasMore) return null;
     return (
-      <View className="py-5 items-center">
-        <ActivityIndicator size="small" color={theme.colors.primary} />
+      <View style={{ paddingVertical: 20, alignItems: "center" }}>
+        <ActivityIndicator size="small" color={colors.primary} />
       </View>
     );
-  }, [hasMore]);
+  }, [hasMore, colors.primary]);
 
   return (
     <>
-      <View className="flex-row justify-between items-center px-6 pt-4 pb-2">
-        <Text className="text-[28px] font-bold text-textPrimary tracking-[-0.5px]">
+      <View className="flex-row items-center justify-between px-6 pb-2 pt-4">
+        <Text
+          style={{
+            fontSize: 28,
+            fontWeight: "700",
+            color: colors.textPrimary,
+            letterSpacing: -0.5,
+          }}
+        >
           {"Recents"}
         </Text>
-        <View className="flex-row gap-4">
+        <View style={{ flexDirection: "row", gap: 16 }}>
           <TouchableOpacity>
-            <Search size={22} color={theme.colors.primary} />
+            <Search size={22} color={colors.primary} />
           </TouchableOpacity>
-          <TouchableOpacity>
-            <MoreVertical size={22} color={theme.colors.primary} />
+          <TouchableOpacity onPress={openDrawer}>
+            <Settings size={22} color={colors.primary} />
           </TouchableOpacity>
         </View>
       </View>
 
-      <View className="flex-1 pt-2">
+      <View style={{ flex: 1, paddingTop: 8 }}>
         {loading ? (
-          <View className="flex-1 items-center justify-center">
-            <ActivityIndicator size="large" color={theme.colors.primary} />
+          <View
+            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          >
+            <ActivityIndicator size="large" color={colors.primary} />
           </View>
         ) : sections.length > 0 ? (
           <SectionList
-            className="bg-background px-2"
+            style={{
+              backgroundColor: colors.background,
+              paddingHorizontal: 8,
+            }}
             sections={sections}
             keyExtractor={(item, index) => item.id || index.toString()}
             stickySectionHeadersEnabled={false}
@@ -87,7 +102,15 @@ const Home = () => {
             )}
             renderSectionHeader={({ section }) => (
               <View className="mx-5 mt-6 mb-2">
-                <Text className="text-textSecondary font-semibold text-[13px] uppercase tracking-[0.5px]">
+                <Text
+                  style={{
+                    color: colors.textSecondary,
+                    fontWeight: "600",
+                    fontSize: 13,
+                    textTransform: "uppercase",
+                    letterSpacing: 0.5,
+                  }}
+                >
                   {section.title}
                 </Text>
               </View>
@@ -98,9 +121,18 @@ const Home = () => {
             ListFooterComponent={renderFooter}
           />
         ) : (
-          <View className="flex-1 items-center justify-center">
-            <Clock size={48} color={theme.colors.border} />
-            <Text className="text-textSecondary text-[17px] mt-4 font-medium">
+          <View
+            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          >
+            <Clock size={48} color={colors.border} />
+            <Text
+              style={{
+                color: colors.textSecondary,
+                fontSize: 17,
+                marginTop: 16,
+                fontWeight: "500",
+              }}
+            >
               {"No recent calls"}
             </Text>
           </View>

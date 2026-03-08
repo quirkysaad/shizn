@@ -5,7 +5,6 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  StyleSheet,
   Alert,
   StatusBar,
   KeyboardAvoidingView,
@@ -26,7 +25,7 @@ import {
 } from "lucide-react-native";
 import { CallLogsModule } from "../../modules/dialer-module";
 import { useContacts, useRecents } from "../../utils/AppProviders";
-import theme from "../../utils/theme";
+import { useTheme } from "../../utils/ThemeContext";
 import { CallLogProps, CallSectionProps } from "../../types";
 import CallLog from "../../components/CallLog";
 import { groupCallsByDate } from "../../utils/general-utils";
@@ -36,13 +35,13 @@ export default function ContactDetail() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { refresh } = useContacts();
+  const { colors, isDark } = useTheme();
   const [contact, setContact] = useState<Contacts.Contact | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [callHistory, setCallHistory] = useState<CallLogProps[]>([]);
 
-  // Editable fields
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phones, setPhones] = useState<{ label: string; number: string }[]>([]);
@@ -159,7 +158,6 @@ export default function ContactDetail() {
       await Contacts.updateContactAsync(updatedContact);
       refresh();
       setEditing(false);
-      // Reload contact
       const result = await Contacts.getContactByIdAsync(id, [
         Contacts.Fields.PhoneNumbers,
         Contacts.Fields.Emails,
@@ -206,16 +204,30 @@ export default function ContactDetail() {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-background justify-center items-center pt-[StatusBar.currentHeight || 0]">
-        <ActivityIndicator size="large" color={theme.colors.primary} />
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   if (!contact) {
     return (
-      <View className="flex-1 bg-background justify-center items-center pt-[StatusBar.currentHeight || 0]">
-        <Text className="text-textSecondary text-[17px]">
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text style={{ color: colors.textSecondary, fontSize: 17 }}>
           {"Contact not found"}
         </Text>
       </View>
@@ -223,27 +235,48 @@ export default function ContactDetail() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <View className="flex-1 bg-background pt-[StatusBar.currentHeight || 0]">
-        <View className="flex-row items-center justify-between px-4 py-3.5 border-b-[0.5px] border-border">
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            paddingHorizontal: 16,
+            paddingVertical: 14,
+            borderBottomWidth: 0.5,
+            borderBottomColor: colors.border,
+          }}
+        >
           <TouchableOpacity
             onPress={() => router.back()}
-            className="p-1 min-w-[60px]"
+            style={{ padding: 4, minWidth: 60 }}
           >
-            <ArrowLeft size={20} color={theme.colors.textPrimary} />
+            <ArrowLeft size={20} color={colors.textPrimary} />
           </TouchableOpacity>
-          <Text className="text-lg font-semibold text-textPrimary">
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: "600",
+              color: colors.textPrimary,
+            }}
+          >
             {editing ? "Edit Contact" : "Contact"}
           </Text>
           {editing ? (
             <TouchableOpacity
               onPress={handleSave}
               disabled={saving}
-              className="p-1 min-w-[60px]"
+              style={{ padding: 4, minWidth: 60 }}
             >
               <Text
-                className="text-base font-semibold text-primary text-right"
-                style={[saving && { opacity: 0.5 }]}
+                style={{
+                  fontSize: 16,
+                  fontWeight: "600",
+                  color: colors.primary,
+                  textAlign: "right",
+                  opacity: saving ? 0.5 : 1,
+                }}
               >
                 {"Save"}
               </Text>
@@ -251,9 +284,16 @@ export default function ContactDetail() {
           ) : (
             <TouchableOpacity
               onPress={() => setEditing(true)}
-              className="p-1 min-w-[60px]"
+              style={{ padding: 4, minWidth: 60 }}
             >
-              <Text className="text-base font-medium text-primary text-right">
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "500",
+                  color: colors.primary,
+                  textAlign: "right",
+                }}
+              >
                 {"Edit"}
               </Text>
             </TouchableOpacity>
@@ -262,42 +302,76 @@ export default function ContactDetail() {
 
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
-          className="flex-1"
+          style={{ flex: 1 }}
         >
           <ScrollView
-            className="flex-1 px-5"
+            style={{ flex: 1, paddingHorizontal: 20 }}
             keyboardShouldPersistTaps="handled"
           >
             {/* Avatar and name */}
             <Animated.View
               entering={FadeInDown.delay(100).duration(400)}
-              className="items-center py-6"
+              style={{ alignItems: "center", paddingVertical: 24 }}
             >
               <Animated.View
                 entering={ZoomIn.delay(200).duration(400)}
-                className="w-[90px] h-[90px] rounded-[45px] bg-primaryLight justify-center items-center"
+                style={{
+                  width: 90,
+                  height: 90,
+                  borderRadius: 45,
+                  backgroundColor: colors.primaryLight,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
               >
-                <User size={40} color={theme.colors.primary} />
+                <User size={40} color={colors.primary} />
               </Animated.View>
               {!editing ? (
                 <>
-                  <Text className="text-2xl font-semibold text-textPrimary mt-3.5">
+                  <Text
+                    style={{
+                      fontSize: 24,
+                      fontWeight: "600",
+                      color: colors.textPrimary,
+                      marginTop: 14,
+                    }}
+                  >
                     {contact.name || "No Name"}
                   </Text>
                 </>
               ) : (
-                <View className="w-full mt-4">
+                <View style={{ width: "100%", marginTop: 16 }}>
                   <TextInput
-                    className="border border-border rounded-xl px-4 py-[14px] text-base text-textPrimary mb-2.5 bg-card"
+                    style={{
+                      borderWidth: 1,
+                      borderColor: colors.border,
+                      borderRadius: 12,
+                      paddingHorizontal: 16,
+                      paddingVertical: 14,
+                      fontSize: 16,
+                      color: colors.textPrimary,
+                      marginBottom: 10,
+                      backgroundColor: colors.card,
+                    }}
                     placeholder="First name"
-                    placeholderTextColor={theme.colors.textSecondary}
+                    placeholderTextColor={colors.textSecondary}
                     value={firstName}
                     onChangeText={setFirstName}
                   />
                   <TextInput
-                    className="border border-border rounded-xl px-4 py-[14px] text-base text-textPrimary mb-2.5 bg-card"
+                    style={{
+                      borderWidth: 1,
+                      borderColor: colors.border,
+                      borderRadius: 12,
+                      paddingHorizontal: 16,
+                      paddingVertical: 14,
+                      fontSize: 16,
+                      color: colors.textPrimary,
+                      marginBottom: 10,
+                      backgroundColor: colors.card,
+                    }}
                     placeholder="Last name"
-                    placeholderTextColor={theme.colors.textSecondary}
+                    placeholderTextColor={colors.textSecondary}
                     value={lastName}
                     onChangeText={setLastName}
                   />
@@ -309,14 +383,33 @@ export default function ContactDetail() {
             {!editing ? (
               <Animated.View
                 entering={FadeInDown.delay(200).duration(400)}
-                className="flex-row justify-center gap-6 mb-6"
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  gap: 24,
+                  marginBottom: 24,
+                }}
               >
                 <TouchableOpacity
-                  className="w-[80px] h-[70px] rounded-2xl bg-primaryLight justify-center items-center gap-[6px]"
+                  style={{
+                    width: 80,
+                    height: 70,
+                    borderRadius: 16,
+                    backgroundColor: colors.primaryLight,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: 6,
+                  }}
                   onPress={() => handleCall(phones[0]?.number)}
                 >
-                  <Phone size={20} color={theme.colors.primary} />
-                  <Text className="text-xs text-textSecondary font-medium">
+                  <Phone size={20} color={colors.primary} />
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      color: colors.textSecondary,
+                      fontWeight: "500",
+                    }}
+                  >
                     {"Call"}
                   </Text>
                 </TouchableOpacity>
@@ -326,25 +419,57 @@ export default function ContactDetail() {
             {/* Phone numbers */}
             <Animated.View
               entering={FadeInDown.delay(300).duration(400)}
-              className="mb-6"
+              style={{ marginBottom: 24 }}
             >
-              <View className="flex-row justify-between items-center">
-                <Text className="text-sm font-semibold text-textSecondary mb-2.5 uppercase tracking-[0.5px]">
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: "600",
+                    color: colors.textSecondary,
+                    marginBottom: 10,
+                    textTransform: "uppercase",
+                    letterSpacing: 0.5,
+                  }}
+                >
                   {"Phone"}
                 </Text>
                 {editing ? (
                   <TouchableOpacity onPress={addPhone}>
-                    <PlusCircle size={22} color={theme.colors.primary} />
+                    <PlusCircle size={22} color={colors.primary} />
                   </TouchableOpacity>
                 ) : null}
               </View>
               {editing
                 ? phones.map((phone, index) => (
-                    <View key={index} className="flex-row items-center">
+                    <View
+                      key={index}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
+                    >
                       <TextInput
-                        className="flex-1 border border-border rounded-xl px-4 py-[14px] text-base text-textPrimary mb-2.5 bg-card"
+                        style={{
+                          flex: 1,
+                          borderWidth: 1,
+                          borderColor: colors.border,
+                          borderRadius: 12,
+                          paddingHorizontal: 16,
+                          paddingVertical: 14,
+                          fontSize: 16,
+                          color: colors.textPrimary,
+                          marginBottom: 10,
+                          backgroundColor: colors.card,
+                        }}
                         placeholder="Phone number"
-                        placeholderTextColor={theme.colors.textSecondary}
+                        placeholderTextColor={colors.textSecondary}
                         value={phone.number}
                         onChangeText={(v) => updatePhone(index, v)}
                         keyboardType="phone-pad"
@@ -352,9 +477,9 @@ export default function ContactDetail() {
                       {phones.length > 1 ? (
                         <TouchableOpacity
                           onPress={() => removePhone(index)}
-                          className="p-2"
+                          style={{ padding: 8 }}
                         >
-                          <MinusCircle size={20} color={theme.colors.danger} />
+                          <MinusCircle size={20} color={colors.danger} />
                         </TouchableOpacity>
                       ) : null}
                     </View>
@@ -363,31 +488,73 @@ export default function ContactDetail() {
                     <TouchableOpacity
                       key={index}
                       onPress={() => handleCall(phone.number)}
-                      className="flex-row justify-between items-center bg-card rounded-xl px-4 py-[14px] mb-2 border border-border"
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        backgroundColor: colors.card,
+                        borderRadius: 12,
+                        paddingHorizontal: 16,
+                        paddingVertical: 14,
+                        marginBottom: 8,
+                        borderWidth: 1,
+                        borderColor: colors.border,
+                      }}
                     >
                       <View>
-                        <Text className="text-xs text-textSecondary capitalize mb-0.5">
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            color: colors.textSecondary,
+                            textTransform: "capitalize",
+                            marginBottom: 2,
+                          }}
+                        >
                           {phone.label}
                         </Text>
-                        <Text className="text-base text-textPrimary">
+                        <Text
+                          style={{
+                            fontSize: 16,
+                            color: colors.textPrimary,
+                          }}
+                        >
                           {phone.number}
                         </Text>
                       </View>
-                      <Phone size={18} color={theme.colors.primary} />
+                      <Phone size={18} color={colors.primary} />
                     </TouchableOpacity>
                   ))}
             </Animated.View>
 
             {/* Email */}
             {editing ? (
-              <View className="mb-6">
-                <Text className="text-sm font-semibold text-textSecondary mb-2.5 uppercase tracking-[0.5px]">
+              <View style={{ marginBottom: 24 }}>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: "600",
+                    color: colors.textSecondary,
+                    marginBottom: 10,
+                    textTransform: "uppercase",
+                    letterSpacing: 0.5,
+                  }}
+                >
                   {"Email"}
                 </Text>
                 <TextInput
-                  className="border border-border rounded-xl px-4 py-[14px] text-base text-textPrimary mb-2.5 bg-card"
+                  style={{
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                    borderRadius: 12,
+                    paddingHorizontal: 16,
+                    paddingVertical: 14,
+                    fontSize: 16,
+                    color: colors.textPrimary,
+                    marginBottom: 10,
+                    backgroundColor: colors.card,
+                  }}
                   placeholder="Email address"
-                  placeholderTextColor={theme.colors.textSecondary}
+                  placeholderTextColor={colors.textSecondary}
                   value={email}
                   onChangeText={setEmail}
                   keyboardType="email-address"
@@ -395,12 +562,36 @@ export default function ContactDetail() {
                 />
               </View>
             ) : email ? (
-              <View className="mb-6">
-                <Text className="text-sm font-semibold text-textSecondary mb-2.5 uppercase tracking-[0.5px]">
+              <View style={{ marginBottom: 24 }}>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: "600",
+                    color: colors.textSecondary,
+                    marginBottom: 10,
+                    textTransform: "uppercase",
+                    letterSpacing: 0.5,
+                  }}
+                >
                   {"Email"}
                 </Text>
-                <View className="flex-row justify-between items-center bg-card rounded-xl px-4 py-[14px] mb-2 border border-border">
-                  <Text className="text-base text-textPrimary">{email}</Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    backgroundColor: colors.card,
+                    borderRadius: 12,
+                    paddingHorizontal: 16,
+                    paddingVertical: 14,
+                    marginBottom: 8,
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                  }}
+                >
+                  <Text style={{ fontSize: 16, color: colors.textPrimary }}>
+                    {email}
+                  </Text>
                 </View>
               </View>
             ) : null}
@@ -409,18 +600,39 @@ export default function ContactDetail() {
             {!editing && callHistory.length > 0 && (
               <Animated.View
                 entering={FadeInDown.delay(350).duration(400)}
-                className="mb-6"
+                style={{ marginBottom: 24 }}
               >
-                <View className="flex-row items-center gap-2 mb-3">
-                  <History size={16} color={theme.colors.textSecondary} />
-                  <Text className="text-sm font-semibold text-textSecondary uppercase tracking-[0.5px]">
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 8,
+                    marginBottom: 12,
+                  }}
+                >
+                  <History size={16} color={colors.textSecondary} />
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontWeight: "600",
+                      color: colors.textSecondary,
+                      textTransform: "uppercase",
+                      letterSpacing: 0.5,
+                    }}
+                  >
                     {"Call History"}
                   </Text>
                 </View>
 
                 <View
-                  className="bg-card rounded-2xl border border-border overflow-hidden"
-                  style={{ maxHeight: 400 }} // Make it a scrollable sub-section
+                  style={{
+                    backgroundColor: colors.card,
+                    borderRadius: 16,
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                    overflow: "hidden",
+                    maxHeight: 400,
+                  }}
                 >
                   <ScrollView
                     nestedScrollEnabled
@@ -429,8 +641,24 @@ export default function ContactDetail() {
                     {groupCallsByDate(callHistory).map(
                       (section: CallSectionProps, sIdx: number) => (
                         <View key={section.title + sIdx}>
-                          <View className="bg-primaryLight/30 px-4 py-1.5">
-                            <Text className="text-[11px] font-bold text-textSecondary uppercase tracking-[1px]">
+                          <View
+                            style={{
+                              backgroundColor: isDark
+                                ? "rgba(255,255,255,0.05)"
+                                : "rgba(0,0,0,0.03)",
+                              paddingHorizontal: 16,
+                              paddingVertical: 6,
+                            }}
+                          >
+                            <Text
+                              style={{
+                                fontSize: 11,
+                                fontWeight: "700",
+                                color: colors.textSecondary,
+                                textTransform: "uppercase",
+                                letterSpacing: 1,
+                              }}
+                            >
                               {section.title}
                             </Text>
                           </View>
@@ -457,12 +685,26 @@ export default function ContactDetail() {
             {/* Delete button */}
             <Animated.View entering={FadeInDown.delay(400).duration(400)}>
               <TouchableOpacity
-                className="flex-row items-center justify-center gap-2 py-[14px] rounded-xl mt-4"
-                style={{ backgroundColor: theme.colors.danger + "22" }}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  paddingVertical: 14,
+                  borderRadius: 12,
+                  marginTop: 16,
+                  backgroundColor: colors.danger + "22",
+                }}
                 onPress={handleDelete}
               >
-                <Trash size={18} color={theme.colors.danger} />
-                <Text className="text-base font-medium text-danger">
+                <Trash size={18} color={colors.danger} />
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "500",
+                    color: colors.danger,
+                  }}
+                >
                   {"Delete Contact"}
                 </Text>
               </TouchableOpacity>

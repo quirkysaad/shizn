@@ -6,14 +6,21 @@ import {
   ScrollView,
   Linking,
 } from "react-native";
-import { Phone, Delete, UserPlus, MessageCircle } from "lucide-react-native";
+import {
+  Phone,
+  Delete,
+  UserPlus,
+  MessageCircle,
+  Settings,
+} from "lucide-react-native";
 import { useRouter } from "expo-router";
 import KeypadButton from "../../components/KeypadButton";
 import ActionButton from "../../components/ActionButton";
 import { CallLogsModule } from "../../modules/dialer-module";
 import { useContacts, useCallState } from "../../utils/AppProviders";
 import { searchContactsT9 } from "../../utils/t9-search";
-import theme from "../../utils/theme";
+import { useTheme } from "../../utils/ThemeContext";
+import { useThemeDrawer } from "../../utils/ThemeDrawerContext";
 import ContactItem from "../../components/ContactItem";
 
 const padRows = [
@@ -43,10 +50,12 @@ function KeypadScreen() {
   const router = useRouter();
   const [phoneNumber, setPhoneNumber] = useState("");
   const { contacts } = useContacts();
+  const { colors } = useTheme();
+  const { openDrawer } = useThemeDrawer();
 
   const t9Results = useMemo(() => {
     if (phoneNumber.length === 0) return [];
-    return searchContactsT9(phoneNumber, contacts).slice(0, 5); // Show top 5 fuzzy matches
+    return searchContactsT9(phoneNumber, contacts).slice(0, 5);
   }, [phoneNumber, contacts]);
 
   const handlePress = useCallback((val: string) => {
@@ -92,10 +101,22 @@ function KeypadScreen() {
 
   return (
     <>
-      <View className="flex-1 w-full justify-between items-center pb-5">
-        <View className="flex-1 w-full flex-col justify-end items-center">
+      <View className="flex-1 w-full items-center justify-between pb-5">
+        <View className="flex-row items-center justify-between px-6 pb-2 pt-4 w-full">
+          <Text
+            className="text-[28px] font-bold tracking-[-0.5px]"
+            style={{ color: colors.textPrimary }}
+          >
+            {"Phone"}
+          </Text>
+          <TouchableOpacity onPress={openDrawer}>
+            <Settings size={22} color={colors.primary} />
+          </TouchableOpacity>
+        </View>
+
+        <View className="flex-1 w-full items-center justify-end flex-col">
           <ScrollView
-            className="flex-1 flex-start grow w-full mb-2"
+            className="flex-1 flex-grow mb-2 w-full"
             showsVerticalScrollIndicator={false}
           >
             {t9Results.map((result, index) => (
@@ -105,7 +126,6 @@ function KeypadScreen() {
                 index={index}
                 isLastLogOfSection={index === t9Results.length - 1}
                 onCall={(num) => CallLogsModule.makeCall(num)}
-                className="w-full"
                 onPress={() => {
                   if ((result as any).id) {
                     router.push(`/contact/${(result as any).id}`);
@@ -115,7 +135,7 @@ function KeypadScreen() {
             ))}
 
             {phoneNumber.length > 0 && (
-              <View className="px-6 pt-4 pb-2 w-full flex flex-row gap-3">
+              <View className="flex-row gap-3 px-6 pb-2 pt-4 w-full">
                 <ActionButton
                   icon={UserPlus}
                   label="Create new contact"
@@ -125,14 +145,14 @@ function KeypadScreen() {
                       params: { number: phoneNumber },
                     });
                   }}
-                  className="grow"
+                  style={{ flexGrow: 1 }}
                 />
                 <ActionButton
                   icon={MessageCircle}
                   label=""
                   onPress={() => {
                     const cleanNumber =
-                      phoneNumber?.replace(/[\s-()]/g, "") || "";
+                      phoneNumber?.replace(/[\s\-()]/g, "") || "";
                     Linking.openURL(`sms:${cleanNumber}`);
                   }}
                 />
@@ -140,9 +160,10 @@ function KeypadScreen() {
             )}
           </ScrollView>
 
-          <View className="flex flex-row items-center justify-center pb-2 px-6">
+          <View className="flex-row items-center justify-center px-6 pb-2">
             <Text
-              className="grow text-[36px] font-normal text-textPrimary text-center"
+              className="flex-grow text-center text-4xl font-normal"
+              style={{ color: colors.textPrimary }}
               numberOfLines={1}
               adjustsFontSizeToFit
             >
@@ -151,49 +172,46 @@ function KeypadScreen() {
           </View>
         </View>
 
-        <View className="w-full items-center">
+        <View style={{ width: "100%", alignItems: "center" }}>
           {padRows.map((row, rowIndex) => (
-            <View key={rowIndex} className="flex-row justify-center w-full">
-              {row.map((btn, btnIndex) => (
+            <View className="flex-row justify-center w-full">
+              {row.map((btn) => (
                 <View key={btn.number}>
                   <KeypadButton
                     number={btn.number}
                     letters={btn.letters}
                     onPress={handlePress}
                     onLongPress={handleLongPress}
-                    className="mx-3"
                   />
                 </View>
               ))}
             </View>
           ))}
 
-          <View className="relative flex-row justify-center items-center w-full mt-2">
-            {/* <View className="w-[70px]" /> */}
+          <View className="relative mt-2 flex-row items-center justify-center w-full">
             <TouchableOpacity
               activeOpacity={0.7}
-              className="bg-success rounded-full w-[70px] h-[70px] justify-center items-center"
+              className="h-[70px] w-[70px] items-center justify-center rounded-[35px] shadow-lg elevation-4"
               style={{
-                shadowColor: theme.colors.primary,
+                backgroundColor: colors.success,
+                shadowColor: colors.primary,
                 shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.3,
                 shadowRadius: 8,
-                elevation: 4,
               }}
               onPress={dialNumber}
               onLongPress={__DEV__ ? handleMockCall : undefined}
             >
-              <Phone size={36} color={theme.colors.white} />
+              <Phone size={36} color={colors.white} />
             </TouchableOpacity>
 
-            {/* Delete Digit Icon */}
             {phoneNumber.length > 0 && (
               <TouchableOpacity
                 onPress={handleBackspace}
                 onLongPress={handleLongBackspace}
-                className="absolute right-[40px] w-[80px] h-[80px] justify-center items-center"
+                className="absolute right-10 h-20 w-20 items-center justify-center"
               >
-                <Delete size={28} color={theme.colors.textPrimary} />
+                <Delete size={28} color={colors.textPrimary} />
               </TouchableOpacity>
             )}
           </View>

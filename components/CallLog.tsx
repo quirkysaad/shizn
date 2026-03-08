@@ -10,8 +10,7 @@ import { CallLogsModule } from "../modules/dialer-module";
 import { CallSectionProps, CallTypes } from "../types";
 import { Alert } from "react-native";
 import { useRecents } from "../utils/AppProviders";
-import theme from "../utils/theme";
-import clsx from "clsx";
+import { useTheme } from "../utils/ThemeContext";
 import { SwipeableRow } from "./SwipeableRow";
 
 interface CallLogItemProps {
@@ -22,16 +21,6 @@ interface CallLogItemProps {
   hideCallButton?: boolean;
   onPress?: () => void;
 }
-
-const IconMap: Record<
-  Exclude<CallTypes, "UNKNOWN">,
-  { IconComponent: any; color: string }
-> = {
-  INCOMING: { IconComponent: PhoneIncoming, color: theme.colors.success },
-  OUTGOING: { IconComponent: PhoneOutgoing, color: theme.colors.primary },
-  MISSED: { IconComponent: PhoneMissed, color: theme.colors.warning },
-  REJECTED: { IconComponent: PhoneMissed, color: theme.colors.danger },
-};
 
 const formatDuration = (seconds: number): string => {
   if (seconds === 0) return "";
@@ -50,10 +39,21 @@ const CallLog = ({
   onPress,
 }: CallLogItemProps) => {
   const { refresh } = useRecents();
+  const { colors } = useTheme();
+
+  const IconMap: Record<
+    Exclude<CallTypes, "UNKNOWN">,
+    { IconComponent: any; color: string }
+  > = {
+    INCOMING: { IconComponent: PhoneIncoming, color: colors.success },
+    OUTGOING: { IconComponent: PhoneOutgoing, color: colors.primary },
+    MISSED: { IconComponent: PhoneMissed, color: colors.warning },
+    REJECTED: { IconComponent: PhoneMissed, color: colors.danger },
+  };
 
   const iconData = IconMap[logItem.type as keyof typeof IconMap] || {
     IconComponent: Phone,
-    color: theme.colors.textSecondary,
+    color: colors.textSecondary,
   };
 
   const handleCall = useCallback(() => {
@@ -109,25 +109,40 @@ const CallLog = ({
         activeOpacity={0.7}
         onPress={onPress}
         onLongPress={handleLongPress}
-        className={clsx(
-          "flex-row items-center bg-card px-4 py-3 mx-2 border-b-border",
-          logIndex === 0 && "rounded-t-2xl",
-          isLastLogOfSection ? "rounded-b-2xl border-b-0" : "border-b",
-        )}
+        className="flex-row items-center px-4 py-3"
+        style={{
+          backgroundColor: colors.card,
+          borderBottomColor: colors.border,
+          ...(logIndex === 0 && {
+            borderTopLeftRadius: 16,
+            borderTopRightRadius: 16,
+          }),
+          ...(isLastLogOfSection
+            ? {
+                borderBottomLeftRadius: 16,
+                borderBottomRightRadius: 16,
+                borderBottomWidth: 0,
+              }
+            : { borderBottomWidth: 1 }),
+        }}
       >
-        <View className="w-11 h-11 rounded-full justify-center items-center mr-[14px]">
+        <View className="mr-3.5 h-11 w-11 items-center justify-center rounded-full">
           <iconData.IconComponent color={iconData.color} size={22} />
         </View>
-        <View className="flex-1">
+        <View style={{ flex: 1 }}>
           <View className="flex-row items-center gap-[6px]">
-            <Text className="text-[17px] font-medium" numberOfLines={1}>
+            <Text
+              className="text-[17px] font-medium"
+              style={{ color: colors.textPrimary }}
+              numberOfLines={1}
+            >
               {displayName}
             </Text>
           </View>
-          <View className="flex-row items-center mt-[3px]">
+          <View className="mt-[3px] flex-row items-center">
             <Text
               className="text-[13px]"
-              style={{ color: theme.colors.textSecondary }}
+              style={{ color: colors.textSecondary }}
             >
               {logItem.type === "INCOMING"
                 ? "Incoming"
@@ -139,7 +154,7 @@ const CallLog = ({
             </Text>
             <Text
               className="text-[13px]"
-              style={{ color: theme.colors.textSecondary }}
+              style={{ color: colors.textSecondary }}
             >
               {" \u00B7 "}
               {timestamp}
@@ -147,7 +162,7 @@ const CallLog = ({
             {duration ? (
               <Text
                 className="text-[13px]"
-                style={{ color: theme.colors.textSecondary }}
+                style={{ color: colors.textSecondary }}
               >
                 {" \u00B7 "}
                 {duration}
@@ -159,17 +174,10 @@ const CallLog = ({
           <TouchableOpacity
             onPress={handleCall}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            style={{
-              padding: 8,
-              backgroundColor: theme.colors.primaryLight,
-              borderRadius: 20,
-              width: 40,
-              height: 40,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
+            className="h-10 w-10 items-center justify-center rounded-full p-2"
+            style={{ backgroundColor: colors.primaryLight }}
           >
-            <Phone color={theme.colors.primary} size={20} />
+            <Phone color={colors.primary} size={20} />
           </TouchableOpacity>
         )}
       </TouchableOpacity>

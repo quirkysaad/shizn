@@ -8,17 +8,20 @@ import {
   TextInput,
 } from "react-native";
 import * as ContactsModule from "expo-contacts";
-import { Plus, Search, XCircle, BookUser } from "lucide-react-native";
+import { Plus, Search, XCircle, BookUser, Settings } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { CallLogsModule } from "../../modules/dialer-module";
 import { useContacts } from "../../utils/AppProviders";
-import theme from "../../utils/theme";
+import { useTheme } from "../../utils/ThemeContext";
+import { useThemeDrawer } from "../../utils/ThemeDrawerContext";
 import ContactItem from "../../components/ContactItem";
 
 function Contacts() {
   const { contacts, loading } = useContacts();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const { colors } = useTheme();
+  const { openDrawer } = useThemeDrawer();
 
   const sections = React.useMemo(() => {
     let filteredContacts = contacts;
@@ -87,42 +90,65 @@ function Contacts() {
 
   return (
     <>
-      <View className="flex-row justify-between items-center px-6 pt-4 pb-2">
-        <Text className="text-[28px] font-bold text-textPrimary tracking-[-0.5px]">
+      <View className="flex-row items-center justify-between px-6 pb-2 pt-4">
+        <Text
+          style={{
+            fontSize: 28,
+            fontWeight: "700",
+            color: colors.textPrimary,
+            letterSpacing: -0.5,
+          }}
+        >
           {"Contacts"}
         </Text>
-        <View className="flex-row gap-4">
+        <View style={{ flexDirection: "row", gap: 16 }}>
           <TouchableOpacity onPress={handleCreateContact}>
-            <Plus size={22} color={theme.colors.primary} />
+            <Plus size={22} color={colors.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={openDrawer}>
+            <Settings size={22} color={colors.primary} />
           </TouchableOpacity>
         </View>
       </View>
 
-      <View className="px-5 pb-3">
-        <View className="flex-row items-center bg-card rounded-xl px-4 py-2 border border-border">
-          <Search size={16} color={theme.colors.textSecondary} />
+      <View className="px-3 pb-3">
+        <View
+          className="flex-row items-center rounded-xl border px-4 py-2"
+          style={{
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+          }}
+        >
+          <Search size={16} color={colors.textSecondary} />
           <TextInput
-            className="flex-1 ml-2 text-base text-textPrimary"
+            style={{
+              flex: 1,
+              marginLeft: 8,
+              fontSize: 16,
+              color: colors.textPrimary,
+            }}
             placeholder="Search contacts..."
-            placeholderTextColor={theme.colors.textSecondary}
+            placeholderTextColor={colors.textSecondary}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity
               onPress={() => setSearchQuery("")}
-              className="p-1"
+              style={{ padding: 4 }}
             >
-              <XCircle size={16} color={theme.colors.textSecondary} />
+              <XCircle size={16} color={colors.textSecondary} />
             </TouchableOpacity>
           )}
         </View>
       </View>
 
-      <View className="flex-1">
+      <View style={{ flex: 1 }}>
         {loading ? (
-          <View className="flex-1 items-center justify-center">
-            <ActivityIndicator size="large" color={theme.colors.primary} />
+          <View
+            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          >
+            <ActivityIndicator size="large" color={colors.primary} />
           </View>
         ) : contacts.length > 0 ? (
           <SectionList
@@ -138,8 +164,23 @@ function Contacts() {
               />
             )}
             renderSectionHeader={({ section }) => (
-              <View className="mx-6 mt-4 mb-2 bg-background">
-                <Text className="text-textSecondary font-semibold text-[13px] uppercase tracking-[0.5px]">
+              <View
+                style={{
+                  marginHorizontal: 24,
+                  marginTop: 16,
+                  marginBottom: 8,
+                  backgroundColor: colors.background,
+                }}
+              >
+                <Text
+                  style={{
+                    color: colors.textSecondary,
+                    fontWeight: "600",
+                    fontSize: 13,
+                    textTransform: "uppercase",
+                    letterSpacing: 0.5,
+                  }}
+                >
                   {section.title}
                 </Text>
               </View>
@@ -150,9 +191,18 @@ function Contacts() {
             windowSize={5}
           />
         ) : (
-          <View className="flex-1 items-center justify-center">
-            <BookUser size={48} color={theme.colors.border} />
-            <Text className="text-textSecondary text-[17px] mt-4 font-medium">
+          <View
+            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          >
+            <BookUser size={48} color={colors.border} />
+            <Text
+              style={{
+                color: colors.textSecondary,
+                fontSize: 17,
+                marginTop: 16,
+                fontWeight: "500",
+              }}
+            >
               {"No contacts found"}
             </Text>
           </View>

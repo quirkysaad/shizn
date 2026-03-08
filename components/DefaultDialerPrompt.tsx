@@ -5,13 +5,15 @@ import {
   TouchableOpacity,
   AppState,
   AppStateStatus,
+  StyleSheet,
 } from "react-native";
 import { PhoneCall } from "lucide-react-native";
 import { CallLogsModule } from "../modules/dialer-module";
-import theme from "../utils/theme";
+import { useTheme } from "../utils/ThemeContext";
 
 const DefaultDialerPrompt = ({ children }: { children: React.ReactNode }) => {
   const [isDefault, setIsDefault] = useState<boolean | null>(null);
+  const { colors } = useTheme();
 
   const checkDefault = async () => {
     try {
@@ -26,7 +28,6 @@ const DefaultDialerPrompt = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     checkDefault();
 
-    // Check when app resumes from background (user might have changed it in settings)
     const subscription = AppState.addEventListener(
       "change",
       (nextAppState: AppStateStatus) => {
@@ -44,52 +45,57 @@ const DefaultDialerPrompt = ({ children }: { children: React.ReactNode }) => {
   const handleRequest = async () => {
     try {
       await CallLogsModule.requestDefaultDialer();
-      // On Android requestDefaultDialer starts an activity, so we wait for AppState change to check again.
-      // But we can also check manually after a short delay or let AppState handle it.
       setTimeout(checkDefault, 1000);
     } catch (e) {
       console.log("Error requesting default dialer", e);
     }
   };
 
-  if (isDefault === null) return null; // Loading state
-
-  if (isDefault) {
-    return <>{children}</>;
-  }
+  if (isDefault === null) return null;
 
   return (
-    <View
-      className="flex-1 items-center justify-center p-8"
-      style={{ backgroundColor: theme.colors.background }}
-    >
-      <View
-        className="items-center justify-center w-24 h-24 rounded-full mb-8 shadow-sm"
-        style={{ backgroundColor: theme.colors.successLight }}
-      >
-        <PhoneCall size={48} color={theme.colors.success} />
-      </View>
-      <Text
-        className="text-2xl font-bold text-center mb-4"
-        style={{ color: theme.colors.textPrimary }}
-      >
-        Default Phone App
-      </Text>
-      <Text
-        className="text-base text-center mb-10"
-        style={{ color: theme.colors.textSecondary }}
-      >
-        Shizn needs to be your default phone app to make and receive calls, and
-        to show your call history.
-      </Text>
+    <View style={{ flex: 1 }}>
+      {children}
+      {!isDefault && (
+        <View
+          className="flex-1 items-center justify-center p-8"
+          style={{
+            ...StyleSheet.absoluteFillObject,
+            backgroundColor: colors.background,
+            zIndex: 9999,
+          }}
+        >
+          <View
+            className="mb-8 h-24 w-24 items-center justify-center rounded-[48px]"
+            style={{ backgroundColor: colors.successLight }}
+          >
+            <PhoneCall size={48} color={colors.success} />
+          </View>
+          <Text
+            className="mb-4 text-center text-2xl font-bold"
+            style={{ color: colors.textPrimary }}
+          >
+            Default Phone App
+          </Text>
+          <Text
+            className="mb-10 text-center text-base"
+            style={{ color: colors.textSecondary }}
+          >
+            Shizn needs to be your default phone app to make and receive calls,
+            and to show your call history.
+          </Text>
 
-      <TouchableOpacity
-        onPress={handleRequest}
-        className="w-full py-4 rounded-xl flex-row items-center justify-center"
-        style={{ backgroundColor: theme.colors.success }}
-      >
-        <Text className="text-white font-bold text-lg">Set as Default</Text>
-      </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleRequest}
+            className="w-full flex-row items-center justify-center rounded-xl py-4"
+            style={{ backgroundColor: colors.success }}
+          >
+            <Text className="text-lg font-bold" style={{ color: colors.white }}>
+              Set as Default
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };

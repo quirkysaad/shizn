@@ -2,8 +2,7 @@ import React, { useCallback } from "react";
 import { View, Text, TouchableOpacity, Linking } from "react-native";
 import * as ContactsModule from "expo-contacts";
 import { User, Phone } from "lucide-react-native";
-import clsx from "clsx";
-import theme from "../utils/theme";
+import { useTheme } from "../utils/ThemeContext";
 import { SwipeableRow } from "./SwipeableRow";
 
 interface ContactItemProps {
@@ -12,7 +11,8 @@ interface ContactItemProps {
   isLastLogOfSection?: boolean;
   onPress?: () => void;
   onCall?: (n: string) => void;
-  className?: string; // Additional classNames to override container styles
+  className?: string;
+  style?: any;
   swipeDisabled?: boolean;
 }
 
@@ -23,9 +23,11 @@ const ContactItem = React.memo(
     isLastLogOfSection = false,
     onPress,
     onCall,
-    className,
+    style: containerStyle,
     swipeDisabled = false,
   }: ContactItemProps) => {
+    const { colors } = useTheme();
+
     const handleCall = useCallback(() => {
       const number = item.phoneNumbers?.[0]?.number;
       if (number) {
@@ -52,32 +54,44 @@ const ContactItem = React.memo(
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={onPress}
-          className={clsx(
-            "flex-row items-center border-b-[0.5px] border-border px-2 py-5 bg-card",
+          className="flex-row items-center border-b px-2 py-5"
+          style={[
             {
-              "rounded-t-2xl": index === 0,
-              "rounded-b-2xl": isLastLogOfSection,
+              borderBottomColor: colors.border,
+              backgroundColor: colors.card,
             },
-            className && className.includes("bg-") ? "" : "bg-card",
-          )}
+            index === 0 && {
+              borderTopLeftRadius: 16,
+              borderTopRightRadius: 16,
+            },
+            isLastLogOfSection && {
+              borderBottomLeftRadius: 16,
+              borderBottomRightRadius: 16,
+            },
+            containerStyle,
+          ]}
         >
           <View
-            className="w-11 h-11 rounded-full mr-4 justify-center items-center"
-            style={{ backgroundColor: theme.colors.primaryLight }}
+            className="mr-4 h-11 w-11 items-center justify-center rounded-full"
+            style={{ backgroundColor: colors.primaryLight }}
           >
-            <User size={20} color={theme.colors.primary} />
+            <User size={20} color={colors.primary} />
           </View>
-          <View className="flex-1">
+          <View style={{ flex: 1 }}>
             <View className="flex-row items-center gap-[6px]">
               <Text
-                className="text-base font-medium text-textPrimary"
+                className="text-base font-medium"
+                style={{ color: colors.textPrimary }}
                 numberOfLines={1}
               >
                 {item.name || "No Name"}
               </Text>
             </View>
             {item.phoneNumbers && item.phoneNumbers.length > 0 ? (
-              <Text className="text-[13px] text-textSecondary mt-0.5">
+              <Text
+                className="mt-0.5 text-[13px]"
+                style={{ color: colors.textSecondary }}
+              >
                 {item.phoneNumbers[0].number}
               </Text>
             ) : null}
@@ -89,9 +103,10 @@ const ContactItem = React.memo(
                 handleCall();
               }}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              className="p-2 bg-primaryLight rounded-[20px] w-10 h-10 justify-center items-center"
+              className="h-10 w-10 items-center justify-center rounded-full p-2"
+              style={{ backgroundColor: colors.primaryLight }}
             >
-              <Phone size={18} color={theme.colors.primary} />
+              <Phone size={18} color={colors.primary} />
             </TouchableOpacity>
           )}
         </TouchableOpacity>
