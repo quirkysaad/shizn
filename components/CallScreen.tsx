@@ -62,13 +62,7 @@ const CallScreen = () => {
     }
 
     if (!callState) {
-      if (wasInCall.current) {
-        try {
-          CallLogsModule.moveTaskToBack?.();
-        } catch (_e) {}
-        wasInCall.current = false;
-      }
-
+      wasInCall.current = false;
       setTimer(0);
       setIsMuted(false);
       setIsSpeaker(false);
