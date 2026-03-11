@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -17,6 +17,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { Sun, Moon, Smartphone, Check, X } from "lucide-react-native";
 import { useTheme, ThemeMode } from "../utils/ThemeContext";
+import { CallLogsModule } from "../modules/dialer-module";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const DRAWER_WIDTH = SCREEN_WIDTH * 0.78;
@@ -32,25 +33,25 @@ const THEME_OPTIONS: {
   icon: any;
   description: string;
 }[] = [
-  {
-    mode: "light",
-    label: "Light",
-    icon: Sun,
-    description: "Always use the light theme",
-  },
-  {
-    mode: "dark",
-    label: "Dark",
-    icon: Moon,
-    description: "Always use the dark theme",
-  },
-  {
-    mode: "system",
-    label: "System Default",
-    icon: Smartphone,
-    description: "Match your device settings",
-  },
-];
+    {
+      mode: "light",
+      label: "Light",
+      icon: Sun,
+      description: "Always use the light theme",
+    },
+    {
+      mode: "dark",
+      label: "Dark",
+      icon: Moon,
+      description: "Always use the dark theme",
+    },
+    {
+      mode: "system",
+      label: "System Default",
+      icon: Smartphone,
+      description: "Match your device settings",
+    },
+  ];
 
 const ThemeDrawer = ({ visible, onClose }: ThemeDrawerProps) => {
   const { mode, setMode, colors, isDark } = useTheme();
@@ -322,7 +323,25 @@ const ThemeDrawer = ({ visible, onClose }: ThemeDrawerProps) => {
             theme
           </Text>
         </View>
+
+        {/* App Settings Button */}
+        <TouchableOpacity
+          onPress={() => CallLogsModule.openAppSettings?.()}
+          style={{
+            marginHorizontal: 16,
+            marginTop: 16,
+            padding: 14,
+            borderRadius: 12,
+            backgroundColor: colors.primaryLight,
+            alignItems: "center",
+          }}
+        >
+          <Text style={{ color: colors.primary, fontWeight: "600" }}>
+            Open App Settings
+          </Text>
+        </TouchableOpacity>
       </Animated.View>
+
     </View>
   );
 };

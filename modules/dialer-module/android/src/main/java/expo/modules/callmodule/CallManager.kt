@@ -110,15 +110,15 @@ object CallManager {
     fun launchApp(context: android.content.Context) {
         try {
             val packageName = context.packageName
-            val launchIntent = context.packageManager.getLaunchIntentForPackage(packageName)
-            launchIntent?.let {
-                it.addFlags(
+            val launchIntent = android.content.Intent().apply {
+                setClassName(packageName, "$packageName.MainActivity")
+                addFlags(
                     android.content.Intent.FLAG_ACTIVITY_NEW_TASK or
                         android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or
                         android.content.Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
                 )
-                context.startActivity(it)
             }
+            context.startActivity(launchIntent)
         } catch (e: Exception) {
             // Log error
         }

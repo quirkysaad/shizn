@@ -172,9 +172,9 @@ function KeypadScreen() {
           </View>
         </View>
 
-        <View style={{ width: "100%", alignItems: "center" }}>
+        <View className="w-[400px]">
           {padRows.map((row, rowIndex) => (
-            <View className="flex-row justify-center w-full">
+            <View className="flex-row justify-around items-center" key={rowIndex}>
               {row.map((btn) => (
                 <View key={btn.number}>
                   <KeypadButton
@@ -191,14 +191,7 @@ function KeypadScreen() {
           <View className="relative mt-2 flex-row items-center justify-center w-full">
             <TouchableOpacity
               activeOpacity={0.7}
-              className="h-[70px] w-[70px] items-center justify-center rounded-[35px] shadow-lg elevation-4"
-              style={{
-                backgroundColor: colors.success,
-                shadowColor: colors.primary,
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.3,
-                shadowRadius: 8,
-              }}
+              className="h-[70px] w-[70px] items-center justify-center rounded-full bg-success"
               onPress={dialNumber}
               onLongPress={__DEV__ ? handleMockCall : undefined}
             >

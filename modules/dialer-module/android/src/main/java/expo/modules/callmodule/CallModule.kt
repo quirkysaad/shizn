@@ -225,7 +225,18 @@ class CallModule : Module() {
       promise.resolve(isDefault)
     }
 
+    // Open App Settings (to toggle things like pause activity if unused, or other permissions)
+    Function("openAppSettings") {
+      val activity = appContext.currentActivity
+      if (activity != null) {
+        val intent = android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        intent.data = android.net.Uri.fromParts("package", activity.packageName, null)
+        activity.startActivity(intent)
+      }
+    }
+
     // Answer
+
     Function("answerCall") {
       CallManager.answer()
     }

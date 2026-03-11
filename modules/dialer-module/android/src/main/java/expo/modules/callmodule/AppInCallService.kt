@@ -1,5 +1,7 @@
 package expo.modules.callmodule
 
+import android.app.ActivityManager
+import android.app.KeyguardManager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -84,7 +86,7 @@ class AppInCallService : InCallService() {
 
     companion object {
         private const val TAG = "AppInCallService"
-        private const val CHANNEL_ID = "incoming_call_channel"
+        private const val CHANNEL_ID = "incoming_call_channel_v2"
         private const val NOTIFICATION_ID = 1001
     }
 
@@ -99,7 +101,11 @@ class AppInCallService : InCallService() {
             startRinging()
             registerScreenOffReceiver()
             showIncomingCallNotification(call)
-            wakeUpScreen()
+            
+            val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+            if (!powerManager.isInteractive) {
+                wakeUpScreen()
+            }
         }
     }
 
@@ -158,35 +164,65 @@ class AppInCallService : InCallService() {
         }
     }
 
-    private fun createNotificationChannel() {
+    private fun isAppInForeground(): Boolean {
+        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val appProcesses = activityManager.runningAppProcesses ?: return false
+        val packageName = applicationContext.packageName
+        for (appProcess in appProcesses) {
+            if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND && appProcess.processName == packageName) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun createNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
+            val notificationManager = getSystemService(NotificationManager::class.java)
+
+            // High priority channel for heads-up and lock screen
+            val channelHigh = NotificationChannel(
+                "incoming_call_channel_v4",
                 "Incoming Calls",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 description = "Notifications for incoming phone calls"
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-                setSound(null, null) // We handle ringtone ourselves
-                enableVibration(false) // We handle vibration ourselves
+                setSound(null, null) // System silent, we play our own
+                enableVibration(false)
             }
-            val notificationManager = getSystemService(NotificationManager::class.java)
-            notificationManager.createNotificationChannel(channel)
+            notificationManager.createNotificationChannel(channelHigh)
+
+            // Low priority channel for when app is already open
+            val channelLow = NotificationChannel(
+                "incoming_call_channel_silent",
+                "Incoming Calls (Silent)",
+                NotificationManager.IMPORTANCE_LOW
+            ).apply {
+                description = "Silent notifications for when app is open"
+                lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                setSound(null, null) // System silent, we play our own
+                enableVibration(false)
+            }
+            notificationManager.createNotificationChannel(channelLow)
         }
     }
 
     private fun showIncomingCallNotification(call: Call) {
-        createNotificationChannel()
+        createNotificationChannels()
 
+        val isInForeground = isAppInForeground()
+        val channelId = if (isInForeground) "incoming_call_channel_silent" else "incoming_call_channel_v4"
         val number = call.details?.handle?.schemeSpecificPart ?: "Unknown"
-
-        // Full-screen intent to launch the app
         val packageName = applicationContext.packageName
-        val fullScreenIntent = applicationContext.packageManager.getLaunchIntentForPackage(packageName)
-        fullScreenIntent?.addFlags(
-            Intent.FLAG_ACTIVITY_NEW_TASK or
-                Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-        )
+
+        // Intent to launch the app
+        val fullScreenIntent = Intent().apply {
+            setClassName(packageName, "$packageName.MainActivity")
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+            putExtra("is_incoming_call", true)
+            putExtra("phone_number", number)
+        }
 
         val fullScreenPendingIntent = PendingIntent.getActivity(
             this, 0, fullScreenIntent,
@@ -209,24 +245,39 @@ class AppInCallService : InCallService() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        val isLocked = (getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager).isKeyguardLocked
+
+        val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(android.R.drawable.ic_menu_call)
             .setContentTitle("Incoming Call")
             .setContentText(number)
-            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setPriority(if (isInForeground) NotificationCompat.PRIORITY_LOW else NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_CALL)
-            .setFullScreenIntent(fullScreenPendingIntent, true)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .addAction(android.R.drawable.ic_menu_call, "Accept", acceptPendingIntent)
-            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Reject", rejectPendingIntent)
             .setOngoing(true)
             .setAutoCancel(false)
-            .build()
+            .setContentIntent(fullScreenPendingIntent)
+            .addAction(0, "Accept", acceptPendingIntent)
+            .addAction(0, "Decline", rejectPendingIntent)
+
+        // Only attach fullScreenIntent if the app is NOT in the foreground
+        if (!isInForeground) {
+            notificationBuilder.setFullScreenIntent(fullScreenPendingIntent, true)
+        }
+
+        val notification = notificationBuilder.build()
 
         val notificationManager = getSystemService(NotificationManager::class.java)
         notificationManager.notify(NOTIFICATION_ID, notification)
-        Log.d(TAG, "Incoming call notification shown for $number")
+        Log.d(TAG, "Incoming call notification shown for $number. isInForeground=$isInForeground")
+        
+        // Safety net: if locked or screen off, try to manually launch the app just in case fullScreenIntent isn't enough
+        if (isLocked || !powerManager.isInteractive) {
+            CallManager.launchApp(applicationContext)
+        }
     }
+
 
     private fun cancelNotification() {
         try {

@@ -22,7 +22,7 @@ const KeypadButton = ({
       activeOpacity={0.6}
       onPress={() => onPress(number)}
       onLongPress={() => onLongPress && onLongPress(number)}
-      className="mx-3 h-20 w-20 items-center justify-center"
+      className="h-20 w-20 items-center justify-center"
     >
       <Text
         className="text-[30px] font-normal"

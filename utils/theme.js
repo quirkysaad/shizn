@@ -1,7 +1,7 @@
 const lightColors = {
   primary: "#000000",
   primaryLight: "#F5F5F5",
-  background: "#FFFFFF",
+  background: "#F5F5F5",
   card: "#FFFFFF",
   textPrimary: "#111111",
   textSecondary: "#888888",

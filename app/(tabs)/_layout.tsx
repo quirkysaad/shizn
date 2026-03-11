@@ -7,7 +7,7 @@ const TabLayout = () => {
   const { colors } = useTheme();
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+    <SafeAreaView className="flex-1">
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: colors.primary,

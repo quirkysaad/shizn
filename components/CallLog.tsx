@@ -109,7 +109,7 @@ const CallLog = ({
         activeOpacity={0.7}
         onPress={onPress}
         onLongPress={handleLongPress}
-        className="flex-row items-center px-4 py-3"
+        className="flex-row items-center px-4 py-2.5"
         style={{
           backgroundColor: colors.card,
           borderBottomColor: colors.border,
@@ -119,10 +119,10 @@ const CallLog = ({
           }),
           ...(isLastLogOfSection
             ? {
-                borderBottomLeftRadius: 16,
-                borderBottomRightRadius: 16,
-                borderBottomWidth: 0,
-              }
+              borderBottomLeftRadius: 16,
+              borderBottomRightRadius: 16,
+              borderBottomWidth: 0,
+            }
             : { borderBottomWidth: 1 }),
         }}
       >

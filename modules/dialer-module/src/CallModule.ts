@@ -19,6 +19,7 @@ declare class CallModule extends NativeModule {
   handlePowerButton(): void;
   getActiveCall(): { number: string; state: number; isMuted: boolean; audioRoute: number; callCount: number } | null;
   moveTaskToBack(): void;
+  openAppSettings(): void;
 }
 
 // This call loads the native module object from the JSI.
