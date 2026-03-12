@@ -83,8 +83,7 @@ function Contacts() {
   }, [router]);
 
   const keyExtractor = useCallback(
-    (item: ContactsModule.Contact, index: number) =>
-      item.id || `contact-${index}`,
+    (item: any, index: number) => (item.id ? item.id : index.toString()),
     [],
   );
 
@@ -92,16 +91,12 @@ function Contacts() {
     <>
       <View className="flex-row items-center justify-between px-6 pb-2 pt-4">
         <Text
-          style={{
-            fontSize: 28,
-            fontWeight: "700",
-            color: colors.textPrimary,
-            letterSpacing: -0.5,
-          }}
+          className="text-[28px] font-bold tracking-[-0.5px]"
+          style={{ color: colors.textPrimary }}
         >
           {"Contacts"}
         </Text>
-        <View style={{ flexDirection: "row", gap: 16 }}>
+        <View className="flex-row gap-4">
           <TouchableOpacity onPress={handleCreateContact}>
             <Plus size={22} color={colors.primary} />
           </TouchableOpacity>
@@ -121,12 +116,8 @@ function Contacts() {
         >
           <Search size={16} color={colors.textSecondary} />
           <TextInput
-            style={{
-              flex: 1,
-              marginLeft: 8,
-              fontSize: 16,
-              color: colors.textPrimary,
-            }}
+            className="flex-1 ml-2 text-base"
+            style={{ color: colors.textPrimary }}
             placeholder="Search contacts..."
             placeholderTextColor={colors.textSecondary}
             value={searchQuery}
@@ -135,7 +126,7 @@ function Contacts() {
           {searchQuery.length > 0 && (
             <TouchableOpacity
               onPress={() => setSearchQuery("")}
-              style={{ padding: 4 }}
+              className="p-1"
             >
               <XCircle size={16} color={colors.textSecondary} />
             </TouchableOpacity>
@@ -143,43 +134,33 @@ function Contacts() {
         </View>
       </View>
 
-      <View style={{ flex: 1 }}>
+      <View className="flex-1">
         {loading ? (
-          <View
-            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-          >
+          <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="large" color={colors.primary} />
           </View>
         ) : contacts.length > 0 ? (
           <SectionList
             sections={sections}
             keyExtractor={keyExtractor}
+            className="px-4"
             renderItem={({ section, item, index }) => (
               <ContactItem
                 item={item}
                 index={index}
-                onPress={() => handleOpenContact(item.id!)}
+                onPress={() => handleOpenContact((item as any).id)}
                 onCall={handleCallContact}
                 isLastLogOfSection={index === section.data.length - 1}
               />
             )}
             renderSectionHeader={({ section }) => (
               <View
-                style={{
-                  marginHorizontal: 24,
-                  marginTop: 16,
-                  marginBottom: 8,
-                  backgroundColor: colors.background,
-                }}
+                className="mx-6 mt-4 mb-2"
+                style={{ backgroundColor: colors.background }}
               >
                 <Text
-                  style={{
-                    color: colors.textSecondary,
-                    fontWeight: "600",
-                    fontSize: 13,
-                    textTransform: "uppercase",
-                    letterSpacing: 0.5,
-                  }}
+                  className="text-[13px] font-semibold uppercase tracking-[0.5px]"
+                  style={{ color: colors.textSecondary }}
                 >
                   {section.title}
                 </Text>
@@ -191,17 +172,11 @@ function Contacts() {
             windowSize={5}
           />
         ) : (
-          <View
-            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-          >
+          <View className="flex-1 items-center justify-center">
             <BookUser size={48} color={colors.border} />
             <Text
-              style={{
-                color: colors.textSecondary,
-                fontSize: 17,
-                marginTop: 16,
-                fontWeight: "500",
-              }}
+              className="mt-4 text-[17px] font-medium"
+              style={{ color: colors.textSecondary }}
             >
               {"No contacts found"}
             </Text>

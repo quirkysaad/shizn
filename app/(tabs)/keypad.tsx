@@ -17,7 +17,11 @@ import { useRouter } from "expo-router";
 import KeypadButton from "../../components/KeypadButton";
 import ActionButton from "../../components/ActionButton";
 import { CallLogsModule } from "../../modules/dialer-module";
-import { useContacts, useCallState, useRecents } from "../../utils/AppProviders";
+import {
+  useContacts,
+  useCallState,
+  useRecents,
+} from "../../utils/AppProviders";
 import { searchContactsT9 } from "../../utils/t9-search";
 import { useTheme } from "../../utils/ThemeContext";
 import { useThemeDrawer } from "../../utils/ThemeDrawerContext";
@@ -59,7 +63,7 @@ function KeypadScreen() {
     if (phoneNumber.length === 0) {
       // Show Frequently Contacted (Favorites)
       const counts: Record<string, number> = {};
-      rawLogs.forEach(log => {
+      rawLogs.forEach((log) => {
         const key = log.name || log.number;
         counts[key] = (counts[key] || 0) + 1;
       });
@@ -68,15 +72,18 @@ function KeypadScreen() {
         .sort((a, b) => counts[b] - counts[a])
         .slice(0, 3);
 
-      return sorted.map(key => {
-        const contact = contacts.find(c => c.name === key || c.phoneNumbers?.some(p => p.number === key));
+      return sorted.map((key) => {
+        const contact = contacts.find(
+          (c) =>
+            c.name === key || c.phoneNumbers?.some((p) => p.number === key),
+        );
         if (contact) return { ...contact, isFavorite: true };
 
         // If not in contacts, return a partial object
         return {
           name: key,
           phoneNumbers: [{ number: key }],
-          isFavorite: true
+          isFavorite: true,
         } as any;
       });
     }
@@ -84,6 +91,7 @@ function KeypadScreen() {
   }, [phoneNumber, contacts, rawLogs]);
 
   const handlePress = useCallback((val: string) => {
+    CallLogsModule.playDtmfTone?.(val);
     setPhoneNumber((prev) => prev + val);
   }, []);
 
@@ -142,13 +150,16 @@ function KeypadScreen() {
         <View className="flex-1 w-full items-center justify-end flex-col">
           {phoneNumber.length === 0 && t9Results.length > 0 && (
             <View className="w-full px-6 mb-2">
-              <Text className="text-xs uppercase font-bold opacity-40" style={{ color: colors.textPrimary }}>
+              <Text
+                className="text-xs uppercase font-bold opacity-40"
+                style={{ color: colors.textPrimary }}
+              >
                 Frequently Contacted
               </Text>
             </View>
           )}
           <ScrollView
-            className="flex-1 flex-grow mb-2 w-full"
+            className="flex-1 flex-grow mb-2 px-4 w-full"
             showsVerticalScrollIndicator={false}
           >
             {t9Results.map((result, index) => (
@@ -177,7 +188,7 @@ function KeypadScreen() {
                       params: { number: phoneNumber },
                     });
                   }}
-                  style={{ flexGrow: 1 }}
+                  className="flex-1"
                 />
                 <ActionButton
                   icon={MessageCircle}
@@ -194,7 +205,7 @@ function KeypadScreen() {
 
           <View className="flex-row items-center justify-center px-6 pb-2">
             <Text
-              className="flex-grow text-center text-4xl font-normal"
+              className="flex-1 text-center text-4xl font-normal"
               style={{ color: colors.textPrimary }}
               numberOfLines={1}
               adjustsFontSizeToFit

@@ -120,10 +120,10 @@ const CallLog = ({
           }),
           ...(isLastLogOfSection
             ? {
-              borderBottomLeftRadius: 16,
-              borderBottomRightRadius: 16,
-              borderBottomWidth: 0,
-            }
+                borderBottomLeftRadius: 16,
+                borderBottomRightRadius: 16,
+                borderBottomWidth: 0,
+              }
             : { borderBottomWidth: 1 }),
         }}
       >
@@ -140,7 +140,7 @@ const CallLog = ({
               {displayName}
             </Text>
           </View>
-          <View className="mt-[3px] flex-row items-center">
+          <View className="mt-1 flex-row items-center">
             <Text
               className="text-[13px]"
               style={{ color: colors.textSecondary }}

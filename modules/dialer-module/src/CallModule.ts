@@ -14,6 +14,7 @@ declare class CallModule extends NativeModule {
   toggleSpeaker(speaker: boolean): void;
   toggleHold(hold: boolean): void;
   sendDtmf(digit: string): void;
+  playDtmfTone(digit: string): void;
   mergeCalls(): void;
   silenceRingtone(): void;
   handlePowerButton(): void;

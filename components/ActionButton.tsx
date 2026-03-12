@@ -18,10 +18,9 @@ const ActionButton = ({
 
   return (
     <TouchableOpacity
-      className="flex-row items-center justify-center rounded-full border px-6 py-[14px]"
+      className="flex-row items-center justify-center rounded-full border px-6 py-[14px] gap-2"
       style={[
         {
-          gap: 8,
           backgroundColor: colors.primaryLight,
           borderColor: colors.border,
         },

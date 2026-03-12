@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   AppState,
   AppStateStatus,
-  StyleSheet,
 } from "react-native";
 import { PhoneCall } from "lucide-react-native";
 import { CallLogsModule } from "../modules/dialer-module";
@@ -67,57 +66,116 @@ const DefaultDialerPrompt = ({ children }: { children: React.ReactNode }) => {
   if (isDefault === null) return null;
 
   return (
-    <View style={{ flex: 1 }}>
+    <View className="flex-1">
       {children}
       <CustomModal
         visible={showHelp}
-        animate={false}
         onClose={() => setShowHelp(false)}
         title="Restricted Settings"
         description="Android 13+ occasionally blocks apps from becoming default dialers. Follow these quick steps to fix it:"
         buttons={[
           {
             text: "1. Open App Info",
-            onPress: () => CallLogsModule.openAppSettings?.()
+            onPress: () => CallLogsModule.openAppSettings?.(),
           },
           {
             text: "Got it",
             variant: "secondary",
-            onPress: () => setShowHelp(false)
-          }
+            onPress: () => setShowHelp(false),
+          },
         ]}
       >
-        <View className="mb-6 space-y-3">
-          <View className="flex-row items-start mb-2">
-            <View className="mr-3 h-6 w-6 items-center justify-center rounded-full bg-primary/10">
-              <Text className="text-xs font-bold text-primary">1</Text>
+        <View className="mb-6 gap-3">
+          <View className="flex-row items-start">
+            <View
+              className="mr-3 h-6 w-6 items-center justify-center rounded-full"
+              style={{ backgroundColor: colors.primary + "1A" }}
+            >
+              <Text
+                className="text-xs font-bold"
+                style={{ color: colors.primary }}
+              >
+                1
+              </Text>
             </View>
-            <Text className="flex-1 text-sm leading-5" style={{ color: colors.textSecondary }}>
-              Tap <Text className="font-bold" style={{ color: colors.textPrimary }}>Open App Info</Text> above.
-            </Text>
-          </View>
-          <View className="flex-row items-start mb-2">
-            <View className="mr-3 h-6 w-6 items-center justify-center rounded-full bg-primary/10">
-              <Text className="text-xs font-bold text-primary">2</Text>
-            </View>
-            <Text className="flex-1 text-sm leading-5" style={{ color: colors.textSecondary }}>
-              Tap the <Text className="font-bold" style={{ color: colors.textPrimary }}>⋮ menu</Text> (top right corner).
-            </Text>
-          </View>
-          <View className="flex-row items-start mb-2">
-            <View className="mr-3 h-6 w-6 items-center justify-center rounded-full bg-primary/10">
-              <Text className="text-xs font-bold text-primary">3</Text>
-            </View>
-            <Text className="flex-1 text-sm leading-5" style={{ color: colors.textSecondary }}>
-              Select <Text className="font-bold" style={{ color: colors.textPrimary }}>Allow restricted settings</Text>.
+            <Text
+              className="flex-1 text-sm leading-5"
+              style={{ color: colors.textSecondary }}
+            >
+              Tap{" "}
+              <Text className="font-bold" style={{ color: colors.textPrimary }}>
+                Open App Info
+              </Text>{" "}
+              above.
             </Text>
           </View>
           <View className="flex-row items-start">
-            <View className="mr-3 h-6 w-6 items-center justify-center rounded-full bg-primary/10">
-              <Text className="text-xs font-bold text-primary">4</Text>
+            <View
+              className="mr-3 h-6 w-6 items-center justify-center rounded-full"
+              style={{ backgroundColor: colors.primary + "1A" }}
+            >
+              <Text
+                className="text-xs font-bold"
+                style={{ color: colors.primary }}
+              >
+                2
+              </Text>
             </View>
-            <Text className="flex-1 text-sm leading-5" style={{ color: colors.textSecondary }}>
-              Return here and tap <Text className="font-bold" style={{ color: colors.textPrimary }}>Set as Default</Text> again.
+            <Text
+              className="flex-1 text-sm leading-5"
+              style={{ color: colors.textSecondary }}
+            >
+              Tap the{" "}
+              <Text className="font-bold" style={{ color: colors.textPrimary }}>
+                ⋮ menu
+              </Text>{" "}
+              (top right corner).
+            </Text>
+          </View>
+          <View className="flex-row items-start">
+            <View
+              className="mr-3 h-6 w-6 items-center justify-center rounded-full"
+              style={{ backgroundColor: colors.primary + "1A" }}
+            >
+              <Text
+                className="text-xs font-bold"
+                style={{ color: colors.primary }}
+              >
+                3
+              </Text>
+            </View>
+            <Text
+              className="flex-1 text-sm leading-5"
+              style={{ color: colors.textSecondary }}
+            >
+              Select{" "}
+              <Text className="font-bold" style={{ color: colors.textPrimary }}>
+                Allow restricted settings
+              </Text>
+              .
+            </Text>
+          </View>
+          <View className="flex-row items-start">
+            <View
+              className="mr-3 h-6 w-6 items-center justify-center rounded-full"
+              style={{ backgroundColor: colors.primary + "1A" }}
+            >
+              <Text
+                className="text-xs font-bold"
+                style={{ color: colors.primary }}
+              >
+                4
+              </Text>
+            </View>
+            <Text
+              className="flex-1 text-sm leading-5"
+              style={{ color: colors.textSecondary }}
+            >
+              Return here and tap{" "}
+              <Text className="font-bold" style={{ color: colors.textPrimary }}>
+                Set as Default
+              </Text>{" "}
+              again.
             </Text>
           </View>
         </View>
@@ -125,16 +183,12 @@ const DefaultDialerPrompt = ({ children }: { children: React.ReactNode }) => {
 
       {!isDefault && (
         <View
-          className="flex-1 items-center justify-center p-8"
-          style={{
-            ...StyleSheet.absoluteFillObject,
-            backgroundColor: colors.background,
-            zIndex: 9999,
-          }}
+          className="absolute inset-0 z-[9999] flex-1 items-center justify-center p-8"
+          style={{ backgroundColor: colors.background }}
         >
           <View
-            className="mb-6 h-24 w-24 items-center justify-center rounded-[48px]"
-            style={{ backgroundColor: colors.success + '15' }}
+            className="mb-6 h-24 w-24 items-center justify-center rounded-full"
+            style={{ backgroundColor: colors.success + "15" }}
           >
             <PhoneCall size={48} color={colors.success} />
           </View>
@@ -145,17 +199,21 @@ const DefaultDialerPrompt = ({ children }: { children: React.ReactNode }) => {
             Default Phone App
           </Text>
           <Text
-            className="mb-10 text-center text-base leading-6"
-            style={{ color: colors.textSecondary, paddingHorizontal: 10 }}
+            className="mb-10 text-center text-base leading-6 px-2.5"
+            style={{ color: colors.textSecondary }}
           >
-            To securely manage your calls and provide high-quality service, Shizn needs to be set as your primary dialer.
+            To securely manage your calls and provide high-quality service,
+            Shizn needs to be set as your primary dialer.
           </Text>
 
           <TouchableOpacity
             onPress={handleRequest}
             activeOpacity={0.8}
             className="w-full h-16 flex-row items-center justify-center rounded-2xl shadow-lg"
-            style={{ backgroundColor: colors.success, shadowColor: colors.success }}
+            style={{
+              backgroundColor: colors.success,
+              shadowColor: colors.success,
+            }}
           >
             <Text className="text-lg font-bold" style={{ color: colors.white }}>
               Set as Default
@@ -166,7 +224,10 @@ const DefaultDialerPrompt = ({ children }: { children: React.ReactNode }) => {
             onPress={() => setShowHelp(true)}
             className="mt-6 py-2"
           >
-            <Text style={{ color: colors.textSecondary, opacity: 0.7, fontWeight: '600', textDecorationLine: 'underline' }}>
+            <Text
+              className="font-semibold underline opacity-70"
+              style={{ color: colors.textSecondary }}
+            >
               Having trouble setting it?
             </Text>
           </TouchableOpacity>

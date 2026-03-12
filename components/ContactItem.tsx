@@ -49,13 +49,12 @@ const ContactItem = React.memo(
         isFirst={index === 0}
         isLast={isLastLogOfSection}
         disabled={swipeDisabled}
-        containerStyle={{ marginHorizontal: 8 }}
       >
         <TouchableOpacity
           activeOpacity={1}
           delayPressIn={50}
           onPress={onPress}
-          className="flex-row items-center border-b px-2 py-5"
+          className="flex-row items-center border-b px-2 py-4"
           style={{
             backgroundColor: colors.card,
             borderBottomColor: colors.border,
@@ -65,10 +64,10 @@ const ContactItem = React.memo(
             }),
             ...(isLastLogOfSection
               ? {
-                borderBottomLeftRadius: 16,
-                borderBottomRightRadius: 16,
-                borderBottomWidth: 0,
-              }
+                  borderBottomLeftRadius: 16,
+                  borderBottomRightRadius: 16,
+                  borderBottomWidth: 0,
+                }
               : { borderBottomWidth: 1 }),
           }}
         >
@@ -78,7 +77,7 @@ const ContactItem = React.memo(
           >
             <User size={20} color={colors.primary} />
           </View>
-          <View style={{ flex: 1 }}>
+          <View className="flex-1">
             <View className="flex-row items-center gap-[6px]">
               <Text
                 className="text-base font-medium"

@@ -86,17 +86,17 @@ const CallScreen = () => {
   const handleAnswer = useCallback(() => {
     try {
       CallLogsModule.answerCall?.();
-    } catch (_e) { }
+    } catch (_e) {}
   }, []);
   const handleReject = useCallback(() => {
     try {
       CallLogsModule.rejectCall?.();
-    } catch (_e) { }
+    } catch (_e) {}
   }, []);
   const handleEndCall = useCallback(() => {
     try {
       CallLogsModule.disconnectCall?.();
-    } catch (_e) { }
+    } catch (_e) {}
   }, []);
 
   const handleToggleMute = useCallback(() => {
@@ -104,7 +104,7 @@ const CallScreen = () => {
     setIsMuted(newMuted);
     try {
       CallLogsModule.toggleMute?.(newMuted);
-    } catch (_e) { }
+    } catch (_e) {}
   }, [isMuted]);
 
   const handleToggleSpeaker = useCallback(() => {
@@ -112,20 +112,20 @@ const CallScreen = () => {
     setIsSpeaker(newSpeaker);
     try {
       CallLogsModule.toggleSpeaker?.(newSpeaker);
-    } catch (_e) { }
+    } catch (_e) {}
   }, [isSpeaker]);
 
   const handleToggleHold = useCallback(() => {
     const isOnHold = callState?.state === 3;
     try {
       CallLogsModule.toggleHold?.(!isOnHold);
-    } catch (_e) { }
+    } catch (_e) {}
   }, [callState?.state]);
 
   const handleMerge = useCallback(() => {
     try {
       CallLogsModule.mergeCalls?.();
-    } catch (_e) { }
+    } catch (_e) {}
   }, []);
 
   const [lastDigit, setLastDigit] = useState<string | null>(null);
@@ -142,7 +142,7 @@ const CallScreen = () => {
 
     try {
       CallLogsModule.sendDtmf?.(digit);
-    } catch (_e) { }
+    } catch (_e) {}
   }, []);
 
   const handleBackspace = useCallback(() => {
@@ -199,62 +199,34 @@ const CallScreen = () => {
   return (
     <Animated.View
       entering={SlideInDown.duration(400)}
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 9999,
-        backgroundColor: colors.background,
-        elevation: 999,
-      }}
+      className="absolute inset-0 z-[9999] elevation-[999]"
+      style={{ backgroundColor: colors.background }}
     >
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView className="flex-1">
         <Animated.View
           entering={FadeInDown.delay(200).duration(400)}
-          style={{
-            alignItems: "center",
-            marginTop: 40,
-            height: 120,
-            justifyContent: "center",
-          }}
+          className="items-center mt-10 h-[120px] justify-center"
         >
           {showKeypad && lastDigit ? (
             <Animated.Text
               key={dtmfDigits.length}
               entering={ZoomIn.duration(200)}
-              style={{
-                color: colors.primary,
-                fontSize: 56,
-                fontWeight: "300",
-              }}
+              className="font-light text-[56px]"
+              style={{ color: colors.primary }}
             >
               {lastDigit}
             </Animated.Text>
           ) : (
             <>
               <Text
-                style={{
-                  color: colors.textSecondary,
-                  fontSize: 16,
-                  fontWeight: "500",
-                  letterSpacing: 1,
-                  marginBottom: 8,
-                }}
+                className="text-[16px] font-medium tracking-widest mb-2"
+                style={{ color: colors.textSecondary }}
               >
                 {statusText}
               </Text>
               <Text
-                style={{
-                  color: colors.textPrimary,
-                  fontSize: 28,
-                  fontWeight: "300",
-                  letterSpacing: -0.5,
-                  marginBottom: 8,
-                  textAlign: "center",
-                  paddingHorizontal: 24,
-                }}
+                className="text-[28px] font-light tracking-[-0.5px] mb-2 text-center px-6"
+                style={{ color: colors.textPrimary }}
                 numberOfLines={2}
                 adjustsFontSizeToFit
               >
@@ -262,13 +234,8 @@ const CallScreen = () => {
               </Text>
               {showKeypad && dtmfDigits ? (
                 <Text
-                  style={{
-                    color: colors.textPrimary,
-                    fontSize: 24,
-                    fontWeight: "400",
-                    letterSpacing: 2,
-                    paddingHorizontal: 40,
-                  }}
+                  className="text-2xl font-normal tracking-[2px] px-10"
+                  style={{ color: colors.textPrimary }}
                   numberOfLines={1}
                   adjustsFontSizeToFit
                 >
@@ -276,10 +243,8 @@ const CallScreen = () => {
                 </Text>
               ) : (
                 <Text
-                  style={{
-                    color: colors.textSecondary,
-                    fontSize: 14,
-                  }}
+                  className="text-sm font-normal"
+                  style={{ color: colors.textSecondary }}
                 >
                   {secondaryText}
                 </Text>
@@ -291,62 +256,30 @@ const CallScreen = () => {
         {!showKeypad ? (
           <Animated.View
             entering={ZoomIn.delay(300).duration(400)}
-            style={{
-              alignItems: "center",
-              marginVertical: 20,
-              flex: 1,
-              justifyContent: "center",
-            }}
+            className="items-center my-5 flex-1 justify-center"
           >
             <View
-              style={{
-                width: 120,
-                height: 120,
-                borderRadius: 60,
-                backgroundColor: colors.primaryLight,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
+              className="w-24 h-24 rounded-full justify-center items-center"
+              style={{ backgroundColor: colors.primaryLight }}
             >
               <User size={56} color={colors.primary} />
             </View>
           </Animated.View>
         ) : (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              paddingHorizontal: 50,
-            }}
-          >
+          <View className="flex-1 justify-center px-12">
             {DTMF_KEYS.map((row, rowIdx) => (
-              <View
-                key={rowIdx}
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-evenly",
-                  marginBottom: 12,
-                }}
-              >
+              <View key={rowIdx} className="flex-row justify-evenly mb-3">
                 {row.map((digit) => (
                   <TouchableOpacity
                     key={digit}
                     activeOpacity={0.6}
-                    style={{
-                      width: 72,
-                      height: 72,
-                      backgroundColor: colors.card,
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
+                    className="w-[72px] h-[72px] justify-center items-center rounded-2xl"
+                    style={{ backgroundColor: colors.card }}
                     onPress={() => handleSendDtmf(digit)}
                   >
                     <Text
-                      style={{
-                        color: colors.textPrimary,
-                        fontSize: 28,
-                        fontWeight: "300",
-                      }}
+                      className="text-[28px] font-light"
+                      style={{ color: colors.textPrimary }}
                     >
                       {digit}
                     </Text>
@@ -361,12 +294,7 @@ const CallScreen = () => {
           <View>
             <Animated.View
               entering={FadeInDown.delay(100).duration(300)}
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-evenly",
-                paddingHorizontal: 30,
-                marginBottom: 24,
-              }}
+              className="flex-row justify-evenly px-7 mb-6"
             >
               <CallActionButton
                 Icon={MicOff}
@@ -393,12 +321,7 @@ const CallScreen = () => {
 
             <Animated.View
               entering={FadeInDown.delay(200).duration(300)}
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-evenly",
-                paddingHorizontal: 30,
-                marginBottom: 32,
-              }}
+              className="flex-row justify-evenly px-7 mb-8"
             >
               <CallActionButton
                 Icon={UserPlus}
@@ -406,7 +329,7 @@ const CallScreen = () => {
                 onPress={() => {
                   try {
                     CallLogsModule.moveTaskToBack?.();
-                  } catch (_e) { }
+                  } catch (_e) {}
                 }}
                 colors={colors}
               />
@@ -430,128 +353,73 @@ const CallScreen = () => {
 
         <Animated.View
           entering={FadeInDown.delay(500).duration(400)}
-          style={{ paddingHorizontal: 40, paddingBottom: 96 }}
+          className="px-10 pb-24"
         >
           {isRinging ? (
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "flex-end",
-              }}
-            >
-              <View style={{ alignItems: "center" }}>
+            <View className="flex-row justify-between items-end">
+              <View className="items-center">
                 <TouchableOpacity
+                  className="w-[70px] h-[70px] rounded-full justify-center items-center shadow-lg elevation-4"
                   style={{
-                    width: 70,
-                    height: 70,
-                    borderRadius: 35,
                     backgroundColor: colors.danger,
-                    justifyContent: "center",
-                    alignItems: "center",
                     shadowColor: colors.danger,
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 8,
-                    elevation: 4,
                   }}
                   onPress={handleReject}
                 >
                   <X size={32} color="white" />
                 </TouchableOpacity>
                 <Text
-                  style={{
-                    color: colors.textSecondary,
-                    fontSize: 13,
-                    marginTop: 8,
-                    fontWeight: "500",
-                  }}
+                  className="text-xs mt-2 font-medium"
+                  style={{ color: colors.textSecondary }}
                 >
                   {"Decline"}
                 </Text>
               </View>
-              <View style={{ alignItems: "center" }}>
+              <View className="items-center">
                 <TouchableOpacity
-                  style={{
-                    width: 60,
-                    height: 60,
-                    borderRadius: 30,
-                    backgroundColor: colors.primaryLight,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
+                  className="w-14 h-14 rounded-full justify-center items-center"
+                  style={{ backgroundColor: colors.primaryLight }}
                   onPress={() => {
                     try {
                       CallLogsModule.silenceRingtone?.();
-                    } catch (_e) { }
+                    } catch (_e) {}
                   }}
                 >
                   <BellOff size={24} color={colors.primary} />
                 </TouchableOpacity>
                 <Text
-                  style={{
-                    color: colors.textSecondary,
-                    fontSize: 13,
-                    marginTop: 8,
-                    fontWeight: "500",
-                  }}
+                  className="text-xs mt-2 font-medium"
+                  style={{ color: colors.textSecondary }}
                 >
                   {"Silence"}
                 </Text>
               </View>
-              <View style={{ alignItems: "center" }}>
+              <View className="items-center">
                 <TouchableOpacity
+                  className="w-[70px] h-[70px] rounded-full justify-center items-center shadow-lg elevation-4"
                   style={{
-                    width: 70,
-                    height: 70,
-                    borderRadius: 35,
                     backgroundColor: colors.success,
-                    justifyContent: "center",
-                    alignItems: "center",
                     shadowColor: colors.success,
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 8,
-                    elevation: 4,
                   }}
                   onPress={handleAnswer}
                 >
                   <Phone size={32} color="white" />
                 </TouchableOpacity>
                 <Text
-                  style={{
-                    color: colors.textSecondary,
-                    fontSize: 13,
-                    marginTop: 8,
-                    fontWeight: "500",
-                  }}
+                  className="text-xs mt-2 font-medium"
+                  style={{ color: colors.textSecondary }}
                 >
                   {"Accept"}
                 </Text>
               </View>
             </View>
           ) : (
-            <View
-              style={{
-                position: "relative",
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
+            <View className="relative flex-row justify-center items-center">
               <TouchableOpacity
+                className="w-[75px] h-[75px] rounded-full justify-center items-center shadow-lg elevation-4"
                 style={{
-                  width: 75,
-                  height: 75,
-                  borderRadius: 37.5,
                   backgroundColor: colors.danger,
-                  justifyContent: "center",
-                  alignItems: "center",
                   shadowColor: colors.danger,
-                  shadowOffset: { width: 0, height: 4 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 8,
-                  elevation: 4,
                 }}
                 onPress={handleEndCall}
               >
@@ -562,14 +430,7 @@ const CallScreen = () => {
                 <TouchableOpacity
                   onPress={handleBackspace}
                   onLongPress={handleLongBackspace}
-                  style={{
-                    position: "absolute",
-                    right: 32,
-                    width: 60,
-                    height: 60,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
+                  className="absolute right-8 w-[60px] h-[60px] justify-center items-center"
                 >
                   <Delete size={28} color={colors.textPrimary} />
                 </TouchableOpacity>
@@ -600,22 +461,18 @@ const CallActionButton = ({
   <TouchableOpacity
     onPress={onPress}
     disabled={disabled}
+    className={`w-[72px] h-[72px] rounded-full justify-center items-center ${
+      active ? "" : ""
+    }`}
     style={{
-      width: 72,
-      height: 72,
-      borderRadius: 36,
-      justifyContent: "center",
-      alignItems: "center",
       backgroundColor: active ? colors.primary : colors.primaryLight,
       opacity: disabled ? 0.3 : 1,
     }}
   >
     <Icon size={18} color={active ? colors.primaryLight : colors.primary} />
     <Text
+      className="text-[11px] mt-1 font-medium"
       style={{
-        fontSize: 11,
-        marginTop: 4,
-        fontWeight: "500",
         color: active ? colors.primaryLight : colors.primary,
       }}
     >

@@ -47,7 +47,7 @@ const Home = () => {
   const renderFooter = useCallback(() => {
     if (!hasMore) return null;
     return (
-      <View style={{ paddingVertical: 20, alignItems: "center" }}>
+      <View className="py-5 items-center">
         <ActivityIndicator size="small" color={colors.primary} />
       </View>
     );
@@ -55,37 +55,29 @@ const Home = () => {
 
   return (
     <>
-      <View className="flex-row items-center justify-between px-6 pb-2 pt-4">
+      <View className="flex-row items-center justify-between px-6 pt-4">
         <Text
-          style={{
-            fontSize: 28,
-            fontWeight: "700",
-            color: colors.textPrimary,
-            letterSpacing: -0.5,
-          }}
+          className="text-[28px] font-bold tracking-[-0.5px]"
+          style={{ color: colors.textPrimary }}
         >
           {"Recents"}
         </Text>
-        <View style={{ flexDirection: "row", gap: 16 }}>
+        <View className="flex-row gap-4">
           <TouchableOpacity onPress={openDrawer}>
             <Settings size={22} color={colors.primary} />
           </TouchableOpacity>
         </View>
       </View>
 
-      <View style={{ flex: 1, paddingTop: 8 }}>
+      <View className="flex-1">
         {loading ? (
-          <View
-            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-          >
+          <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="large" color={colors.primary} />
           </View>
         ) : sections.length > 0 ? (
           <SectionList
-            style={{
-              backgroundColor: colors.background,
-              paddingHorizontal: 8,
-            }}
+            className="px-4"
+            style={{ backgroundColor: colors.background }}
             sections={sections}
             keyExtractor={(item, index) => item.id || index.toString()}
             stickySectionHeadersEnabled={false}
@@ -100,13 +92,8 @@ const Home = () => {
             renderSectionHeader={({ section }) => (
               <View className="mx-5 mt-6 mb-2">
                 <Text
-                  style={{
-                    color: colors.textSecondary,
-                    fontWeight: "600",
-                    fontSize: 13,
-                    textTransform: "uppercase",
-                    letterSpacing: 0.5,
-                  }}
+                  className="text-[13px] font-semibold uppercase tracking-[0.5px]"
+                  style={{ color: colors.textSecondary }}
                 >
                   {section.title}
                 </Text>
@@ -118,17 +105,11 @@ const Home = () => {
             ListFooterComponent={renderFooter}
           />
         ) : (
-          <View
-            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-          >
+          <View className="flex-1 items-center justify-center">
             <Clock size={48} color={colors.border} />
             <Text
-              style={{
-                color: colors.textSecondary,
-                fontSize: 17,
-                marginTop: 16,
-                fontWeight: "500",
-              }}
+              className="mt-4 text-[17px] font-medium"
+              style={{ color: colors.textSecondary }}
             >
               {"No recent calls"}
             </Text>

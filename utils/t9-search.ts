@@ -61,25 +61,31 @@ export const searchContactsT9 = (query: string, contacts: ContactsModule.Contact
       );
     }
 
-    // 1. Highest priority - number includes in contact number
-    const numberIncludes = cleanNumbers.some((num) => num.includes(lowerQuery));
-    
-    // 2. Medium priority - name includes while typing in t9results
-    const nameIncludes = t9Name.includes(lowerQuery);
+    // 1. Exact/Prefix matches
+    const numberStartsWith = cleanNumbers.some((num) => num.startsWith(lowerQuery));
+    const nameStartsWith = t9Name.startsWith(lowerQuery);
 
-    if (numberIncludes) {
-      score = 3;
-    } else if (nameIncludes) {
-      score = 2;
+    // 2. Inclusion matches
+    const numberContains = cleanNumbers.some((num) => num.includes(lowerQuery));
+    const nameContains = t9Name.includes(lowerQuery);
+
+    if (numberStartsWith) {
+      score = 10;
+    } else if (nameStartsWith) {
+      score = 8;
+    } else if (numberContains) {
+      score = 6;
+    } else if (nameContains) {
+      score = 4;
     } else {
-      // 3. Lowest priority - fuzzy match
+      // 3. Fuzzy matches
       const fuzzyNumber = cleanNumbers.some((num) =>
         isFuzzyMatch(lowerQuery, num)
       );
       const fuzzyName = isFuzzyMatch(lowerQuery, t9Name);
 
       if (fuzzyNumber || fuzzyName) {
-        score = 1;
+        score = 2;
       }
     }
 

@@ -6,11 +6,21 @@ import android.provider.CallLog
 import android.telecom.TelecomManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import android.media.AudioManager
+import android.media.ToneGenerator
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import expo.modules.kotlin.Promise
 
 class CallModule : Module() {
+  private var toneGenerator: ToneGenerator? = null
+
+  private fun getToneGenerator(): ToneGenerator {
+    if (toneGenerator == null) {
+      toneGenerator = ToneGenerator(AudioManager.STREAM_DTMF, 80)
+    }
+    return toneGenerator!!
+  }
   override fun definition() = ModuleDefinition {
     Name("CallModule")
 
@@ -266,10 +276,38 @@ class CallModule : Module() {
       if (hold) CallManager.hold() else CallManager.unhold()
     }
 
-    // Send DTMF tone
+    // Send DTMF tone during call
     Function("sendDtmf") { digit: String ->
       if (digit.isNotEmpty()) {
         CallManager.sendDtmf(digit[0])
+      }
+    }
+
+    // Play DTMF tone for UI feedback (even if not in call)
+    Function("playDtmfTone") { digit: String ->
+      if (digit.isNotEmpty()) {
+        val toneType = when (digit[0]) {
+          '1' -> ToneGenerator.TONE_DTMF_1
+          '2' -> ToneGenerator.TONE_DTMF_2
+          '3' -> ToneGenerator.TONE_DTMF_3
+          '4' -> ToneGenerator.TONE_DTMF_4
+          '5' -> ToneGenerator.TONE_DTMF_5
+          '6' -> ToneGenerator.TONE_DTMF_6
+          '7' -> ToneGenerator.TONE_DTMF_7
+          '8' -> ToneGenerator.TONE_DTMF_8
+          '9' -> ToneGenerator.TONE_DTMF_9
+          '0' -> ToneGenerator.TONE_DTMF_0
+          '*' -> ToneGenerator.TONE_DTMF_S
+          '#' -> ToneGenerator.TONE_DTMF_P
+          else -> -1
+        }
+        if (toneType != -1) {
+          try {
+            getToneGenerator().startTone(toneType, 120)
+          } catch (e: Exception) {
+            // Log or handle error
+          }
+        }
       }
     }
 

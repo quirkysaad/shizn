@@ -25,7 +25,7 @@ const KeypadButton = ({
       className="h-20 w-20 items-center justify-center"
     >
       <Text
-        className="text-[30px] font-normal"
+        className="text-3xl font-normal"
         style={{ color: colors.textPrimary }}
       >
         {number}
@@ -41,7 +41,7 @@ const KeypadButton = ({
           {letters}
         </Text>
       ) : (
-        <View className="mt-1 h-[14px]" />
+        <View className="mt-1 h-[12px]" />
       )}
     </TouchableOpacity>
   );
