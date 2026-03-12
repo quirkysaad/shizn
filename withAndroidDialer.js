@@ -83,13 +83,6 @@ module.exports = function withAndroidDialer(config) {
 
     // 2b. Add autoRevokePermissions to mainApplication to prevent pausing app activity
     mainApplication.$["android:autoRevokePermissions"] = "disallowed";
-    if (mainApplication.$["tools:replace"]) {
-      if (!mainApplication.$["tools:replace"].includes("android:autoRevokePermissions")) {
-        mainApplication.$["tools:replace"] += ",android:autoRevokePermissions";
-      }
-    } else {
-      mainApplication.$["tools:replace"] = "android:autoRevokePermissions";
-    }
 
     // 3. Ensure AppInCallService is correctly overridden
     if (!mainApplication.service) mainApplication.service = [];

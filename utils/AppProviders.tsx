@@ -6,7 +6,6 @@ import React, {
   useCallback,
   useRef,
 } from "react";
-import { AppState } from "react-native";
 import * as ContactsModule from "expo-contacts";
 import { CallLogProps } from "../types";
 import { groupCallsByDate } from "../utils/general-utils";
@@ -77,15 +76,7 @@ export const ContactsProvider = ({
       console.log("Contacts permission result:", event);
       fetchContacts(false);
     });
-    const appStateSub = AppState.addEventListener("change", (nextAppState) => {
-      if (nextAppState === "active") {
-        fetchContacts(false);
-      }
-    });
-    return () => {
-      sub.remove();
-      appStateSub.remove();
-    };
+    return () => sub.remove();
   }, [fetchContacts]);
 
   const refresh = useCallback(() => {
@@ -186,15 +177,9 @@ export const RecentsProvider = ({
       console.log("Recents permission result:", event);
       fetchInitial(false);
     });
-    const appStateSub = AppState.addEventListener("change", (nextAppState) => {
-      if (nextAppState === "active") {
-        fetchInitial(false);
-      }
-    });
     return () => {
       subscription.remove();
       permSub.remove();
-      appStateSub.remove();
     };
   }, [fetchInitial]);
 

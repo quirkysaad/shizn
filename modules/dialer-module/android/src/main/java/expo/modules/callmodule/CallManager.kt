@@ -117,8 +117,6 @@ object CallManager {
                         android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or
                         android.content.Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
                 )
-                putExtra("is_incoming_call", true)
-                putExtra("is_incoming", true)
             }
             context.startActivity(launchIntent)
         } catch (e: Exception) {

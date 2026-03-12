@@ -385,12 +385,12 @@ class CallModule : Module() {
     }
     OnActivityResult { _, payload ->
       val (requestCode, resultCode, data) = payload
-      // Send event for any activity result (e.g., Default Dialer role changes)
-      sendEvent("onPermissionResult", mapOf(
-        "type" to "activity",
-        "requestCode" to requestCode,
-        "resultCode" to resultCode
-      ))
+      if (requestCode == 123 || requestCode == 321 || requestCode == 322 || requestCode == 324) {
+        sendEvent("onPermissionResult", mapOf(
+          "requestCode" to requestCode,
+          "resultCode" to resultCode
+        ))
+      }
     }
   }
 }
